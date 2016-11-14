@@ -34,6 +34,6 @@ swarm::bootstrap::restart_docker
 
 #swarm::multinode::start_k8s_master
 
-swarm::bootstrap::start_swarm_master
+swarm::mulinode::start_swarm_master
 
 swarm::log::status "Done. It may take about a minute before apiserver is up."
