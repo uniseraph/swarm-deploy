@@ -12,3 +12,25 @@ automations.
 ```
 yum install -y git && cd /opt && git clone https://github.com/uniseraph/swarm-deploy.git 
 ```
+
+##  初始化本机环境
+
+```
+cd /opt/swarm-deploy && bash init-node.sh
+``
+注意在初始化环境时候，会删除本机原有的docker环境与容器！
+
+在init-node.sh脚本中，会设置docker存储模式为overlay，使用如下命令确认
+```
+docker info | grep STORAGE
+```
+
+在init-node.sh脚本中，会设置docke engine的监听端口为eth0:2376和unix:///var/run/docker.sock，使用如下命令check
+```
+netstat -anlp | grep LISTEN | grep docker
+```
+
+
+### 初始化swarm-master节点
+
+### 初始化swarm-agent 节点
