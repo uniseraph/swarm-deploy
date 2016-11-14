@@ -199,8 +199,8 @@ swarm::multinode::start_swarm_master() {
     --pid=host \
     --restart=${RESTART_POLICY} \
     swarm:${SWARM_VERSION} \
-    manage \
-    --host=${SWARM_LISTEN_URL} \
+    join \
+    --addr   ${DOCKER_LISTEN_URL}\
     ${ZK_URL}
 
   docker run -d \
@@ -208,10 +208,9 @@ swarm::multinode::start_swarm_master() {
     --pid=host \
     --restart=${RESTART_POLICY} \
     swarm:${SWARM_VERSION} \
-    join \
-    --addr   ${DOCKER_LISTEN_URL}\
+    manage \
+    --host=${SWARM_LISTEN_URL} \
     ${ZK_URL}
-
 }
 
 
