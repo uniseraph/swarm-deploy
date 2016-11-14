@@ -45,7 +45,7 @@ swarm::multinode::main(){
   swarm::log::status "SWARM_VERSION is set to: ${SWARM_VERSION}"
   ETCD_VERSION=${ETCD_VERSION:-"3.0.4"}
   swarm::log::status "ETCD_VERSION is set to: ${ETCD_VERSION}"
-  ZK_VERSION=${ZK_VERSION:-3.4.6}
+  ZK_VERSION=${ZK_VERSION:-3.4.9}
   swarm::log::status "ZK_VERSION is set to: ${ZK_VERSION}"
 
   swarm::log::status "ZK_URL  is set to: ${ZK_URL}"
@@ -88,7 +88,7 @@ swarm::multinode::start_zookeeper() {
     --net=host  \
     -v /var/lib/zookeeper/data:/data \
     -v /var/lib/zookeeper/datalog:/datalog \
-    jplock/zookeeper:${ZOOKEEPER_VERSION} 
+    zookeeper:${ZK_VERSION} 
 
 
 }
