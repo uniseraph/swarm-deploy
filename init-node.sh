@@ -18,6 +18,6 @@ DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
 
 sed -e  "s#daemon#daemon -H unix:///var/run/docker.sock -H ${DOCKER_LISTEN_URL}#g" -i /usr/lib/systemd/system/docker.service
 
-systemctl deamon-reload
+systemctl daemon-reload
 
 systemctl restart docker
