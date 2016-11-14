@@ -15,7 +15,7 @@
 # limitations under the License.
 
 cd "$(dirname "${BASH_SOURCE}")"
-source docker-bootstrap.sh
+source ./docker-bootstrap.sh
 
 swarm::multinode::main(){
 
