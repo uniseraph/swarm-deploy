@@ -1,121 +1,183 @@
-Running Multi-Node Kubernetes Using Docker
-------------------------------------------
+# swarm-deploy @ aliyun vpc
 
-## Prerequisites
+This is a repository of community maintained Swarm cluster deployment
+automations.
 
-The only thing you need is a linux machine with **Docker 1.10.0 or higher**
+目前swarm-deploy只支持centos7u2@aliyun vpc ， 后续会支持ubuntu 。
 
-## Overview
 
-This guide will set up a 2-node Kubernetes cluster, consisting of a _master_ node which hosts the API server and orchestrates work
-and a _worker_ node which receives work from the master. You can repeat the process of adding worker nodes an arbitrary number of
-times to create larger clusters.
+## 在阿里云海外节点创建一个vpc 虚拟机，注意要选择 centos7u2的基础镜像
 
-Here's a diagram of what the final result will look like:
-![Kubernetes Single Node on Docker](k8s-docker.png)
-
-### Bootstrap Docker
-
-This guide uses a pattern of running two instances of the Docker daemon:
-   1) A _bootstrap_ Docker instance which is used to start `etcd` and `flanneld`, on which the Kubernetes components depend
-   2) A _main_ Docker instance which is used for the Kubernetes infrastructure and user's scheduled containers
-
-This pattern is necessary because the `flannel` daemon is responsible for setting up and managing the network that interconnects
-all of the Docker containers created by Kubernetes. To achieve this, it must run outside of the _main_ Docker daemon. However,
-it is still useful to use containers for deployment and management, so we create a simpler _bootstrap_ daemon to achieve this.
-
-### Versions supported
-
-v1.2.x and v1.3.x are supported versions for this deployment.
-v1.3.0 alphas and betas might work, but be sure you know what you're doing if you're trying them out.
-
-### Multi-arch solution
-
-Yeah, it's true. You may run this deployment setup seamlessly on `amd64`, `arm`, `arm64` and `ppc64le` hosts.
-See this tracking issue for more details: https://github.com/kubernetes/kubernetes/issues/17981
-
-v1.3.0 ships with support for amd64, arm and arm64. ppc64le isn't supported, due to a bug in the Go runtime, `hyperkube` (only!) isn't built for the stable v1.3.0 release, and therefore this guide can't run it. But you may still run Kubernetes on ppc64le via custom deployments.
-
-hyperkube was pushed for ppc64le at versions `v1.3.0-alpha.3` and `v1.3.0-alpha.4`, feel free to try them out, but there might be some unexpected bugs.
-
-### Options/configuration
-
-The scripts will output something like this when starting:
-
-```console
-+++ [0611 12:50:12] K8S_VERSION is set to: v1.2.4
-+++ [0611 12:50:12] ETCD_VERSION is set to: 2.2.5
-+++ [0611 12:50:12] FLANNEL_VERSION is set to: 0.5.5
-+++ [0611 12:50:12] FLANNEL_IPMASQ is set to: true
-+++ [0611 12:50:12] FLANNEL_NETWORK is set to: 10.1.0.0/16
-+++ [0611 12:50:12] FLANNEL_BACKEND is set to: udp
-+++ [0611 12:50:12] RESTART_POLICY is set to: unless-stopped
-+++ [0611 12:50:12] MASTER_IP is set to: 192.168.1.50
-+++ [0611 12:50:12] ARCH is set to: amd64
-+++ [0611 12:50:12] NET_INTERFACE is set to: eth0
-```
-
-Each of these options are overridable by `export`ing the values before running the script.
-
-## Setup the master node
-
-The first step in the process is to initialize the master node.
-
-Clone the `kube-deploy` repo, and run [master.sh](master.sh) on the master machine _with root_:
-
-```console
-$ git clone https://github.com/kubernetes/kube-deploy
-$ cd kube-deploy/docker-multinode
-$ ./master.sh
-```
-
-First, the `bootstrap` docker daemon is started, then `etcd` and `flannel` are started as containers in the bootstrap daemon.
-Then, the main docker daemon is restarted, and this is an OS/distro-specific tasks, so if it doesn't work for your distro, feel free to contribute!
-
-Lastly, it launches `kubelet` in the main docker daemon, and the `kubelet` in turn launches the control plane (apiserver, controller-manager and scheduler) as static pods.
-
-## Adding a worker node
-
-Once your master is up and running you can add one or more workers on different machines.
-
-Clone the `kube-deploy` repo, and run [worker.sh](worker.sh) on the worker machine _with root_:
-
-```console
-$ git clone https://github.com/kubernetes/kube-deploy
-$ cd kube-deploy/docker-multinode
-$ export MASTER_IP=${SOME_IP}
-$ ./worker.sh
-```
-
-First, the `bootstrap` docker daemon is started, then `flannel` is started as a container in the bootstrap daemon, in order to set up the overlay network.
-Then, the main docker daemon is restarted and lastly `kubelet` is launched as a container in the main docker daemon.
-
-## Get kubectl
+## 登录虚拟机，获取swarm-deploy工具
 
 ```
-curl -sSL https://storage.googleapis.com/kubernetes-release/release/v[KUBECTL_VERSION]/bin/linux/amd64/kubectl > /usr/local/bin/kubectl
-chmod +x /usr/local/bin/kubectl
+yum install -y git && cd /opt && git clone https://github.com/uniseraph/swarm-deploy.git 
 ```
 
-## Addons
+##  初始化本机环境
 
-kube-dns and the dashboard are deployed automatically with v1.3.0
-
-### Deploy DNS manually for v1.2.x
-
-Just specify the architecture, and deploy via these commands:
-
-```console
-# Possible options: amd64, arm, arm64 and ppc64le
-$ export ARCH=amd64
-
-# If the kube-system namespace isn't already created, create it
-$ kubectl get ns
-$ kubectl create namespace kube-system
-
-$ sed -e "s/ARCH/${ARCH}/g;" skydns.yaml | kubectl create -f -
+```
+cd /opt/swarm-deploy && bash init-node.sh
 ```
 
-### Test if DNS works
+注意在初始化环境时候，会删除本机原有的docker环境与容器！
 
-Follow [this link](https://releases.k8s.io/release-1.2/cluster/addons/dns#how-do-i-test-if-it-is-working) to check it out.
+在init-node.sh脚本中，会设置docker存储模式为overlay，使用如下命令确认
+
+```
+docker info | grep STORAGE
+```
+
+在init-node.sh脚本中，会设置docke engine的监听端口为eth0:2376和unix:///var/run/docker.sock，使用如下命令check
+
+```
+netstat -anlp | grep LISTEN | grep docker
+```
+
+
+### 初始化swarm-master节点
+
+```
+cd /opt/swarm/swarm-deploy/vpc && bash master.sh
+[root@iZrj91tefvghte2u30htvzZ vpc]# bash master.sh
++++ [1114 17:26:35] ARCH is set to: amd64
++++ [1114 17:26:35] SWARM_VERSION is set to: 1.2.5
++++ [1114 17:26:35] ETCD_VERSION is set to: 3.0.4
++++ [1114 17:26:35] ZK_VERSION is set to: 3.4.9
++++ [1114 17:26:35] ZK_URL  is set to: zk://10.24.136.254:2181
++++ [1114 17:26:35] BIP is set to: 192.168.1.1/24
++++ [1114 17:26:35] MTU is set to: 1472
++++ [1114 17:26:35] IP_ADDRESS is set to: 10.24.136.254
++++ [1114 17:26:35] Killing docker bootstrap...
++++ [1114 17:26:35] Killing all swarm containers...
+a24b6301e0ba
+cf11ff187bda
++++ [1114 17:26:35] Launching docker bootstrap...
++++ [1114 17:26:36] Launching zookeeper...
+5166ee34422c544c452f6814ad75076adcbc335c89ad96261d4d2feee7f1691f
++++ [1114 17:26:36] waiting 10 seconds for zk starting...
++++ [1114 17:26:46] Restarting main docker daemon...
++++ [1114 17:26:47] Launching swarm master ...
++++ [1114 17:26:47] Launching swarm master , listening at 10.24.136.254:2375 ...
+011507b60b5d3430c96442e5d77f115a63addd115a42794ad27b6ddc14bd586f
+be6469a959c72c05e629de7b8caf3e04409916d952194f6ade117f5bc7e07c45
+```
+
+在这台ECS上，起了多个服务，组成了一个master*1 node*1的swarm 集群。
+
+服务| 地址|
+----|-----|
+zk | zk://10.24.136.254:2181 |
+----|-----|
+swarm master | tcp://10.24.136.254:2375|
+----|-----|
+docker  | tcp://10.24.136.254:2376 and unix:///var/run/docker.sock|
+----|-----|
+bootstrap docker | unix:///var/run/docker-bootstrap.sock|
+
+通过docker info命令可以查看集群情况。
+```
+[root@iZrj91tefvghte2u30htvzZ vpc]# docker -H tcp://10.24.136.254:2375 info
+Containers: 2
+ Running: 2
+ Paused: 0
+ Stopped: 0
+Images: 1
+Server Version: swarm/1.2.5
+Role: primary
+Strategy: spread
+Filters: health, port, containerslots, dependency, affinity, constraint
+Nodes: 1
+ iZrj91tefvghte2u30htvzZ: 10.24.136.254:2376
+  └ ID: 63IV:PSVE:HMSZ:SOAG:4WV4:I5CA:75LU:7HRT:3ZKC:M5HS:3JBS:6R5A
+  └ Status: Healthy
+  └ Containers: 2 (2 Running, 0 Paused, 0 Stopped)
+  └ Reserved CPUs: 0 / 1
+  └ Reserved Memory: 0 B / 1.018 GiB
+  └ Labels: executiondriver=native-0.2, kernelversion=3.10.0-327.22.2.el7.x86_64, operatingsystem=CentOS Linux 7 (Core), storagedriver=overlay
+  └ UpdatedAt: 2016-11-14T09:40:16Z
+  └ ServerVersion: 1.10.3
+Plugins:
+ Volume:
+ Network:
+Kernel Version: 3.10.0-327.22.2.el7.x86_64
+Operating System: linux
+Architecture: amd64
+Number of Docker Hooks: 2
+CPUs: 1
+Total Memory: 1.018 GiB
+Name: iZrj91tefvghte2u30htvzZ
+Registries:
+```
+
+
+通过docker ps命令可以查看集群所有容器
+```
+[root@iZrj91tefvghte2u30htvzZ vpc]# docker -H tcp://10.24.136.254:2375 ps -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+98710ac47dec        swarm:1.2.5         "/swarm manage --host"   12 minutes ago      Up 12 minutes                           iZrj91tefvghte2u30htvzZ/hungry_golick
+cd39dbdbfb86        swarm:1.2.5         "/swarm join --addr 1"   12 minutes ago      Up 12 minutes                           iZrj91tefvghte2u30htvzZ/stupefied_noether
+```
+
+注意，swarm默认的心跳周期是1分钟，所以如果没看到节点或容器，可以等1分钟。
+
+
+### 初始化swarm-agent 节点
+
+创建虚拟机与初始化节点步骤于swarm-master相同。
+
+```
+cd /opt/swarm-deploy/vpc 
+export ZK_URL=zk://10.24.136.254:2181  ＃注意zk地址 , swarm使用zk做节点发现，所有agent都必须注册到zk上
+export BIP=192.168.250.1/24    #注意与其他服务器的BIP要分开， 不能冲突
+bash worker.sh
+```
+
+worker启动成功后，可以查询集群情况，可以发现有两个节点，注意节点注册需要1分钟时间
+```
+[root@iZrj91tefvghte2u30htvzZ vpc]# docker -H 10.24.136.254:2375 info
+Containers: 3
+ Running: 3
+ Paused: 0
+ Stopped: 0
+Images: 2
+Server Version: swarm/1.2.5
+Role: primary
+Strategy: spread
+Filters: health, port, containerslots, dependency, affinity, constraint
+Nodes: 2
+ iZrj9ap7v4yegqey9liovkZ: 10.174.72.36:2376
+  └ ID: QL4V:DPVF:L3FG:KCPQ:7UIA:QRKL:YMPQ:3I4V:TRYR:2MR5:M7GZ:RQMF
+  └ Status: Healthy
+  └ Containers: 1 (1 Running, 0 Paused, 0 Stopped)
+  └ Reserved CPUs: 0 / 1
+  └ Reserved Memory: 0 B / 1.018 GiB
+  └ Labels: executiondriver=native-0.2, kernelversion=3.10.0-327.22.2.el7.x86_64, operatingsystem=CentOS Linux 7 (Core), storagedriver=overlay
+  └ UpdatedAt: 2016-11-14T10:34:22Z
+  └ ServerVersion: 1.10.3
+ iZrj91tefvghte2u30htvzZ: 10.24.136.254:2376
+  └ ID: 63IV:PSVE:HMSZ:SOAG:4WV4:I5CA:75LU:7HRT:3ZKC:M5HS:3JBS:6R5A
+  └ Status: Healthy
+  └ Containers: 2 (2 Running, 0 Paused, 0 Stopped)
+  └ Reserved CPUs: 0 / 1
+  └ Reserved Memory: 0 B / 1.018 GiB
+  └ Labels: executiondriver=native-0.2, kernelversion=3.10.0-327.22.2.el7.x86_64, operatingsystem=CentOS Linux 7 (Core), storagedriver=overlay
+  └ UpdatedAt: 2016-11-14T10:33:44Z
+  └ ServerVersion: 1.10.3
+Plugins:
+ Volume:
+ Network:
+Kernel Version: 3.10.0-327.22.2.el7.x86_64
+Operating System: linux
+Architecture: amd64
+Number of Docker Hooks: 2
+CPUs: 2
+Total Memory: 2.036 GiB
+Name: iZrj91tefvghte2u30htvzZ
+Registries:```
+
+
+
+TODO :
+1.  自动分配BIP，避免冲突
+2.  自动调用自定义路由接口
