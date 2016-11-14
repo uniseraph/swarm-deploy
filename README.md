@@ -62,16 +62,61 @@ cf11ff187bda
 be6469a959c72c05e629de7b8caf3e04409916d952194f6ade117f5bc7e07c45
 ```
 
-在这台ECS上，起了多个服务，其中zk 在 zk:///10.24.136.254:2181 , docker 在 tcp:///10.24.136.254:2376 和 unix
-
-
-type | TCP BW(MB/s) | TCP lat(us)|
------------- | ------------- | ------------
-Native       |117	          | 24.5
+在这台ECS上，起了多个服务，组成了一个master*1 node*1的swarm 集群。
 
 服务| 地址|
 ----|-----|
-zk | zk:///10.24.136.254:2181 |
+zk | zk://10.24.136.254:2181 |
+----|-----|
+swarm master | tcp://10.24.136.254:2375|
+----|-----|
+docker  | tcp://10.24.136.254:2376 and unix:///var/run/docker.sock|
+----|-----|
+bootstrap docker | unix:///var/run/docker-bootstrap.sock|
+
+通过docker info命令可以查看集群情况。
+```
+[root@iZrj91tefvghte2u30htvzZ vpc]# docker -H tcp://10.24.136.254:2375 info
+Containers: 2
+ Running: 2
+ Paused: 0
+ Stopped: 0
+Images: 1
+Server Version: swarm/1.2.5
+Role: primary
+Strategy: spread
+Filters: health, port, containerslots, dependency, affinity, constraint
+Nodes: 1
+ iZrj91tefvghte2u30htvzZ: 10.24.136.254:2376
+  └ ID: 63IV:PSVE:HMSZ:SOAG:4WV4:I5CA:75LU:7HRT:3ZKC:M5HS:3JBS:6R5A
+  └ Status: Healthy
+  └ Containers: 2 (2 Running, 0 Paused, 0 Stopped)
+  └ Reserved CPUs: 0 / 1
+  └ Reserved Memory: 0 B / 1.018 GiB
+  └ Labels: executiondriver=native-0.2, kernelversion=3.10.0-327.22.2.el7.x86_64, operatingsystem=CentOS Linux 7 (Core), storagedriver=overlay
+  └ UpdatedAt: 2016-11-14T09:40:16Z
+  └ ServerVersion: 1.10.3
+Plugins:
+ Volume:
+ Network:
+Kernel Version: 3.10.0-327.22.2.el7.x86_64
+Operating System: linux
+Architecture: amd64
+Number of Docker Hooks: 2
+CPUs: 1
+Total Memory: 1.018 GiB
+Name: iZrj91tefvghte2u30htvzZ
+Registries:
+```
+
+
+通过docker ps命令可以查看集群所有容器
+```
+[root@iZrj91tefvghte2u30htvzZ vpc]# docker -H tcp://10.24.136.254:2375 ps -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+98710ac47dec        swarm:1.2.5         "/swarm manage --host"   12 minutes ago      Up 12 minutes                           iZrj91tefvghte2u30htvzZ/hungry_golick
+cd39dbdbfb86        swarm:1.2.5         "/swarm join --addr 1"   12 minutes ago      Up 12 minutes                           iZrj91tefvghte2u30htvzZ/stupefied_noether
+```
 
 
 
