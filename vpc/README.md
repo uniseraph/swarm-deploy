@@ -68,11 +68,8 @@ be6469a959c72c05e629de7b8caf3e04409916d952194f6ade117f5bc7e07c45
 服务| 地址|
 ----|-----|
 zk | zk://10.24.136.254:2181 |
-----|-----|
 swarm master | tcp://10.24.136.254:2375|
-----|-----|
 docker  | tcp://10.24.136.254:2376 and unix:///var/run/docker.sock|
-----|-----|
 bootstrap docker | unix:///var/run/docker-bootstrap.sock|
 
 通过docker info命令可以查看集群情况。
