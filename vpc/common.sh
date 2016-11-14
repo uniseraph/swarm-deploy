@@ -171,7 +171,7 @@ swarm::multinode::start_flannel() {
 }
 
 swarm::multinode::start_swarm_agent() {
-  swarm::log::status "Launching swarm agent components..."
+  swarm::log::status "Launching swarm agent ..."
 
   DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
   SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
@@ -180,7 +180,7 @@ swarm::multinode::start_swarm_agent() {
   docker run -d \
     --net=host \
     --pid=host \
-    --restart=${RESTART_POLICY} \
+    --restart=always \
     swarm:${SWARM_VERSION} \
     join \
     --addr   ${DOCKER_LISTEN_URL}\
@@ -198,7 +198,7 @@ swarm::multinode::start_swarm_master() {
   docker run -d \
     --net=host \
     --pid=host \
-    --restart=${RESTART_POLICY} \
+    --restart=always \
     swarm:${SWARM_VERSION} \
     join \
     --addr   ${DOCKER_LISTEN_URL}\
@@ -209,7 +209,7 @@ swarm::multinode::start_swarm_master() {
   docker run -d \
     --net=host \
     --pid=host \
-    --restart=${RESTART_POLICY} \
+    --restart=always \
     swarm:${SWARM_VERSION} \
     manage \
     --host=${SWARM_LISTEN_URL} \

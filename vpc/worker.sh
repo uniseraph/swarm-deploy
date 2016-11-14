@@ -18,38 +18,26 @@
 source $(dirname "${BASH_SOURCE}")/common.sh
 
 # Make sure MASTER_IP is properly set
-if [[ -z ${MASTER_IP} ]]; then
-    echo "Please export MASTER_IP in your env"
+if [[ -z ${ZK_URL} ]]; then
+    echo "Please export ZK_URL in your env"
     exit 1
 fi
 
-kube::multinode::main
-
-kube::multinode::log_variables
-
-kube::multinode::turndown
-
-if [[ ${USE_CNI} == "true" ]]; then
-  kube::cni::ensure_docker_settings
-
-  kube::multinode::start_flannel
-else
-  kube::bootstrap::bootstrap_daemon
-
-  kube::multinode::start_flannel
-
-  kube::bootstrap::restart_docker
+if [[ -z ${BIP} ]]; then
+    echo "Please export BIP in your env"
+    exit 1
 fi
 
-kube::multinode::start_k8s_worker
+swarm::multinode::main
 
-# If under v1.4.0-alpha.3, run the proxy
-if [[ $((VERSION_MINOR < 4)) == 1 || \
-      ($((VERSION_MINOR <= 4)) == 1 && \
-      ${VERSION_PRERELEASE} == "alpha" && \
-      $((VERSION_PRERELEASE_REV < 3)) == 1) ]]; then
+swarm::multinode::turndown
 
-	kube::multinode::start_k8s_worker_proxy
-fi
 
-kube::log::status "Done. After about a minute the node should be ready."
+#swarm::multinode::start_flannel
+
+swarm::bootstrap::restart_docker
+
+#swarm::multinode::start_k8s_master
+
+swarm::multinode::start_swarm_agent
+
