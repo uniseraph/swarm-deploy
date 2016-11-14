@@ -195,8 +195,6 @@ swarm::multinode::start_swarm_master() {
   SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
 
   swarm::log::status "Launching swarm master , listening at ${SWARM_LISTEN_URL} ..."
-  
-  
   docker run -d \
     --net=host \
     --pid=host \
@@ -205,6 +203,8 @@ swarm::multinode::start_swarm_master() {
     join \
     --addr   ${DOCKER_LISTEN_URL}\
     ${ZK_URL}
+
+  sleep 2
 
   docker run -d \
     --net=host \
