@@ -2,7 +2,7 @@
 
 
 
-yum install -y git docker ip
+yum install -y  docker
 
 
 echo "DOCKER_STORAGE_OPTIONS=-s overlay" >> /etc/sysconfig/docker-storage
