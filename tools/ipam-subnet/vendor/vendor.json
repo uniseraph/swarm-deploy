@@ -1,0 +1,106 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "G0LFbi2bwKrfbxwmf7C0dGxfTOw=",
+			"origin": "github.com/coreos/flannel/vendor/github.com/coreos/etcd/client",
+			"path": "github.com/coreos/etcd/client",
+			"revision": "30f4a0c254f9497b30f3a36df7cbe3a879392a40",
+			"revisionTime": "2016-10-25T23:57:19Z"
+		},
+		{
+			"checksumSHA1": "mKIXx1kDwmVmdIpZ3pJtRBuUKso=",
+			"origin": "github.com/coreos/flannel/vendor/github.com/coreos/etcd/pkg/pathutil",
+			"path": "github.com/coreos/etcd/pkg/pathutil",
+			"revision": "30f4a0c254f9497b30f3a36df7cbe3a879392a40",
+			"revisionTime": "2016-10-25T23:57:19Z"
+		},
+		{
+			"checksumSHA1": "b6AhrsQdPI51SIuFKAchhkuZUO4=",
+			"origin": "github.com/coreos/flannel/vendor/github.com/coreos/etcd/pkg/tlsutil",
+			"path": "github.com/coreos/etcd/pkg/tlsutil",
+			"revision": "30f4a0c254f9497b30f3a36df7cbe3a879392a40",
+			"revisionTime": "2016-10-25T23:57:19Z"
+		},
+		{
+			"checksumSHA1": "NoliaMQE9Z+sSkgERERgoSl6nOg=",
+			"origin": "github.com/coreos/flannel/vendor/github.com/coreos/etcd/pkg/transport",
+			"path": "github.com/coreos/etcd/pkg/transport",
+			"revision": "30f4a0c254f9497b30f3a36df7cbe3a879392a40",
+			"revisionTime": "2016-10-25T23:57:19Z"
+		},
+		{
+			"checksumSHA1": "PGZ8KQhODQzk57lN3xpVhR2RbB4=",
+			"origin": "github.com/coreos/flannel/vendor/github.com/coreos/etcd/pkg/types",
+			"path": "github.com/coreos/etcd/pkg/types",
+			"revision": "30f4a0c254f9497b30f3a36df7cbe3a879392a40",
+			"revisionTime": "2016-10-25T23:57:19Z"
+		},
+		{
+			"checksumSHA1": "R5qtWhVg0TY3A5jtz+TPkEPC7M4=",
+			"path": "github.com/coreos/flannel/pkg/ip",
+			"revision": "30f4a0c254f9497b30f3a36df7cbe3a879392a40",
+			"revisionTime": "2016-10-25T23:57:19Z"
+		},
+		{
+			"checksumSHA1": "GE5q7LUugot7BBYG1VbY130cPLA=",
+			"path": "github.com/coreos/flannel/subnet",
+			"revision": "30f4a0c254f9497b30f3a36df7cbe3a879392a40",
+			"revisionTime": "2016-10-25T23:57:19Z"
+		},
+		{
+			"checksumSHA1": "qtfdxPAdNtYkfYd7l7wfgQnJcpo=",
+			"path": "github.com/coreos/flannel/version",
+			"revision": "30f4a0c254f9497b30f3a36df7cbe3a879392a40",
+			"revisionTime": "2016-10-25T23:57:19Z"
+		},
+		{
+			"checksumSHA1": "URsJa4y/sUUw/STmbeYx9EKqaYE=",
+			"path": "github.com/golang/glog",
+			"revision": "44145f04b68cf362d9c4df2182967c2275eaefed",
+			"revisionTime": "2014-09-23T20:47:00Z"
+		},
+		{
+			"checksumSHA1": "k/gNBuWnuDDszWCkucM+0xhleAo=",
+			"origin": "github.com/coreos/flannel/vendor/github.com/jonboulle/clockwork",
+			"path": "github.com/jonboulle/clockwork",
+			"revision": "30f4a0c254f9497b30f3a36df7cbe3a879392a40",
+			"revisionTime": "2016-10-25T23:57:19Z"
+		},
+		{
+			"checksumSHA1": "SubpTLnurFt1lvW8AftpgpA50go=",
+			"origin": "github.com/coreos/flannel/vendor/github.com/ugorji/go/codec",
+			"path": "github.com/ugorji/go/codec",
+			"revision": "30f4a0c254f9497b30f3a36df7cbe3a879392a40",
+			"revisionTime": "2016-10-25T23:57:19Z"
+		},
+		{
+			"checksumSHA1": "wbjb5g+KUq7n2S/3/nfliPNHnDg=",
+			"origin": "github.com/coreos/flannel/vendor/github.com/vishvananda/netlink",
+			"path": "github.com/vishvananda/netlink",
+			"revision": "30f4a0c254f9497b30f3a36df7cbe3a879392a40",
+			"revisionTime": "2016-10-25T23:57:19Z"
+		},
+		{
+			"checksumSHA1": "eW5+RtZGlN6QyOQYUD+LDJyJR+g=",
+			"origin": "github.com/coreos/flannel/vendor/github.com/vishvananda/netlink/nl",
+			"path": "github.com/vishvananda/netlink/nl",
+			"revision": "30f4a0c254f9497b30f3a36df7cbe3a879392a40",
+			"revisionTime": "2016-10-25T23:57:19Z"
+		},
+		{
+			"checksumSHA1": "zjfUA3qOv6grhBLpyJ+7EejXWQE=",
+			"origin": "github.com/coreos/flannel/vendor/github.com/vishvananda/netns",
+			"path": "github.com/vishvananda/netns",
+			"revision": "30f4a0c254f9497b30f3a36df7cbe3a879392a40",
+			"revisionTime": "2016-10-25T23:57:19Z"
+		},
+		{
+			"checksumSHA1": "5ARrN3Zq+E9zazFb/N+b08Serys=",
+			"path": "golang.org/x/net/context",
+			"revision": ""
+		}
+	],
+	"rootPath": "github.com/uniseraph/ipam-subnet"
+}
