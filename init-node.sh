@@ -7,7 +7,7 @@ yum remove -y   docker
 yum install -y  docker
 
 
-echo "DOCKER_STORAGE_OPTIONS=-s overlay" >> /etc/sysconfig/docker-storage
+echo "STORAGE_DRIVER=-s overlay" > /etc/sysconfig/docker-storage-setup
 
 modprobe overlay
 echo "overlay" > /etc/modules-load.d/overlay.conf
