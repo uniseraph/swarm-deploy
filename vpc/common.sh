@@ -48,6 +48,8 @@ swarm::multinode::main(){
   ZK_VERSION=${ZK_VERSION:-3.4.6}
   swarm::log::status "ZK_VERSION is set to: ${ZK_VERSION}"
 
+  swarm::log::status "ZK_URL  is set to: ${ZK_URL}"
+
   #FLANNEL_VERSION=${FLANNEL_VERSION:-"v0.6.1"}
   #FLANNEL_IPMASQ=${FLANNEL_IPMASQ:-"true"}
   #FLANNEL_BACKEND=${FLANNEL_BACKEND:-"udp"}
@@ -166,77 +168,56 @@ swarm::multinode::start_flannel() {
   swarm::log::status "FLANNEL_MTU is set to: ${FLANNEL_MTU}"
 }
 
+swarm::multinode::start_swarm_agent() {
+  swarm::log::status "Launching swarm agent components..."
+
+  DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
+  SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
+
+
+  docker run -d \
+    --net=host \
+    --pid=host \
+    --restart=${RESTART_POLICY} \
+    swarm:${SWARM_VERSION} \
+    join \
+    --addr   ${DOCKER_LISTEN_URL}\
+    ${ZK_URL}
+
+}
 # Start swarmlet first and then the master components as pods
-swarm::multinode::start_k8s_master() {
-  swarm::multinode::create_swarmconfig
-  swarm::log::status "Launching swarmrnetes master components..."
+swarm::multinode::start_swarm_master() {
+  swarm::log::status "Launching swarm master components..."
 
-  swarm::multinode::make_shared_swarmlet_dir
+  DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
+  SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
 
   docker run -d \
     --net=host \
     --pid=host \
-    --privileged \
     --restart=${RESTART_POLICY} \
-    --name swarm_swarmlet_$(swarm::helpers::small_sha) \
-    ${swarmLET_MOUNTS} \
-    gcr.io/google_containers/hyperswarm-${ARCH}:${K8S_VERSION} \
-    /hyperswarm swarmlet \
-      --allow-privileged \
-      --api-servers=http://localhost:8080 \
-      --config=/etc/swarmrnetes/manifests-multi \
-      --cluster-dns=10.0.0.10 \
-      --cluster-domain=cluster.local \
-      ${CNI_ARGS} \
-      ${CONTAINERIZED_FLAG} \
-      --hostname-override=${IP_ADDRESS} \
-      --v=2
-}
+    swarm:${SWARM_VERSION} \
+    manage \
+    --host=${SWARM_LISTEN_URL} \
+    ${ZK_URL}
 
-# Start swarmlet in a container, for a worker node
-swarm::multinode::start_k8s_worker() {
-  swarm::multinode::create_swarmconfig
-  swarm::log::status "Launching swarmrnetes worker components..."
-
-  swarm::multinode::make_shared_swarmlet_dir
-
-  # TODO: Use secure port for communication
   docker run -d \
     --net=host \
     --pid=host \
-    --privileged \
     --restart=${RESTART_POLICY} \
-    --name swarm_swarmlet_$(swarm::helpers::small_sha) \
-    ${swarmLET_MOUNTS} \
-    gcr.io/google_containers/hyperswarm-${ARCH}:${K8S_VERSION} \
-    /hyperswarm swarmlet \
-      --allow-privileged \
-      --api-servers=http://${MASTER_IP}:8080 \
-      --cluster-dns=10.0.0.10 \
-      --cluster-domain=cluster.local \
-      ${CNI_ARGS} \
-      ${CONTAINERIZED_FLAG} \
-      --cadvisor-port=4194 \
-      --storage-driver-db="cadvisor" \
-      --storage-driver-host="localhost:8086" \
-      --hostname-override=${IP_ADDRESS} \
-      --v=2
+    swarm:${SWARM_VERSION} \
+    join \
+    --addr   ${DOCKER_LISTEN_URL}\
+    ${ZK_URL}
+
 }
 
-# Start swarm-proxy in a container, for a worker node
-swarm::multinode::start_k8s_worker_proxy() {
 
-  swarm::log::status "Launching swarm-proxy..."
-  docker run -d \
-    --net=host \
-    --privileged \
-    --name swarm_proxy_$(swarm::helpers::small_sha) \
-    --restart=${RESTART_POLICY} \
-    gcr.io/google_containers/hyperswarm-${ARCH}:${K8S_VERSION} \
-    /hyperswarm proxy \
-        --master=http://${MASTER_IP}:8080 \
-        --v=2
-}
+
+
+
+
+
 
 # Turndown the local cluster
 swarm::multinode::turndown(){
