@@ -7,13 +7,13 @@ yum remove -y   docker
 yum install -y  docker
 
 
-echo "STORAGE_DRIVER=-s overlay" > /etc/sysconfig/docker-storage-setup
+echo "STORAGE_DRIVER=overlay" > /etc/sysconfig/docker-storage-setup
 
 modprobe overlay
 echo "overlay" > /etc/modules-load.d/overlay.conf
 
 
-DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
+DOCKER_LISTEN_URL=tcp://$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
 
 
 sed -e  "s#daemon#daemon -H unix:///var/run/docker.sock -H ${DOCKER_LISTEN_URL}#g" -i /usr/lib/systemd/system/docker.service
