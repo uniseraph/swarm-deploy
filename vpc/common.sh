@@ -189,11 +189,14 @@ swarm::multinode::start_swarm_agent() {
 }
 # Start swarmlet first and then the master components as pods
 swarm::multinode::start_swarm_master() {
-  swarm::log::status "Launching swarm master components..."
+  swarm::log::status "Launching swarm master ..."
 
   DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
   SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
 
+  swarm::log::status "Launching swarm master , listening at ${SWARM_LISTEN_URL} ..."
+  
+  
   docker run -d \
     --net=host \
     --pid=host \
