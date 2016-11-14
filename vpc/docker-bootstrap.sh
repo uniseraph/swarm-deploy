@@ -86,7 +86,6 @@ swarm::bootstrap::restart_docker(){
     swarm::log::fatal "Error: docker-bootstrap currently only supports ubuntu|debian|amzn|centos|systemd."
   fi
 
-  swarm::log::status "Restarted docker with the new flannel settings"
 }
 
 
