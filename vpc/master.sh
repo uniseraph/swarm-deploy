@@ -18,6 +18,8 @@
 source $(dirname "${BASH_SOURCE}")/common.sh
 
 
+ZK_URL="zk:$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2181"
+
 swarm::multinode::main
 
 swarm::multinode::turndown
@@ -31,5 +33,7 @@ swarm::multinode::start_zookeeper
 swarm::bootstrap::restart_docker
 
 #swarm::multinode::start_k8s_master
+
+swarm::bootstrap::start_swarm_master
 
 swarm::log::status "Done. It may take about a minute before apiserver is up."
