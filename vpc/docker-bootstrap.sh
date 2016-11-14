@@ -17,9 +17,9 @@
 # Utility functions for Kubernetes in docker setup and bootstrap mode
 
 # Start a docker bootstrap for running etcd and flannel
-kube::bootstrap::bootstrap_daemon() {
+swarm::bootstrap::bootstrap_daemon() {
 
-  kube::log::status "Launching docker bootstrap..."
+  swarm::log::status "Launching docker bootstrap..."
 
 
   modprobe overlay
@@ -41,67 +41,67 @@ kube::bootstrap::bootstrap_daemon() {
   while [[ $(docker -H ${BOOTSTRAP_DOCKER_SOCK} ps 2>&1 1>/dev/null; echo $?) != 0 ]]; do
     ((SECONDS++))
     if [[ ${SECONDS} == ${TIMEOUT_FOR_SERVICES} ]]; then
-      kube::log::fatal "docker bootstrap failed to start. Exiting..."
+      swarm::log::fatal "docker bootstrap failed to start. Exiting..."
     fi
     sleep 1
   done
 }
 
 # Configure docker net settings, then restart it
-kube::bootstrap::restart_docker(){
+swarm::bootstrap::restart_docker(){
 
-  kube::log::status "Restarting main docker daemon..."
+  swarm::log::status "Restarting main docker daemon..."
 
-  if kube::helpers::command_exists systemctl; then
-    kube::bootstrap::restart_docker_systemd
-  elif kube::helpers::command_exists yum; then
+  if swarm::helpers::command_exists systemctl; then
+    swarm::bootstrap::restart_docker_systemd
+  elif swarm::helpers::command_exists yum; then
     DOCKER_CONF="/etc/sysconfig/docker"
-    kube::helpers::backup_file ${DOCKER_CONF}
+    swarm::helpers::backup_file ${DOCKER_CONF}
 
     # Is there an uncommented OPTIONS line at all?
     if [[ -z $(grep "OPTIONS" ${DOCKER_CONF} | grep -v "#") ]]; then
       echo "OPTIONS=\"--mtu=${FLANNEL_MTU} --bip=${FLANNEL_SUBNET} \"" >> ${DOCKER_CONF}
     else
-      kube::helpers::replace_mtu_bip ${DOCKER_CONF} "OPTIONS"
+      swarm::helpers::replace_mtu_bip ${DOCKER_CONF} "OPTIONS"
     fi
 
-    kube::multinode::delete_bridge docker0
+    swarm::multinode::delete_bridge docker0
     systemctl restart docker
-  elif kube::helpers::command_exists apt-get; then
+  elif swarm::helpers::command_exists apt-get; then
     DOCKER_CONF="/etc/default/docker"
-    kube::helpers::backup_file ${DOCKER_CONF}
+    swarm::helpers::backup_file ${DOCKER_CONF}
         
     # Is there an uncommented DOCKER_OPTS line at all?
     if [[ -z $(grep "DOCKER_OPTS" $DOCKER_CONF | grep -v "#") ]]; then
       echo "DOCKER_OPTS=\"--mtu=${FLANNEL_MTU} --bip=${FLANNEL_SUBNET} \"" >> ${DOCKER_CONF}
     else
-      kube::helpers::replace_mtu_bip ${DOCKER_CONF} "DOCKER_OPTS"
+      swarm::helpers::replace_mtu_bip ${DOCKER_CONF} "DOCKER_OPTS"
     fi
 
-    kube::multinode::delete_bridge docker0
+    swarm::multinode::delete_bridge docker0
     service docker stop
     while [[ $(ps aux | grep $(which docker) | grep -v grep | wc -l) -gt 0 ]]; do
-      kube::log::status "Waiting for docker to terminate"
+      swarm::log::status "Waiting for docker to terminate"
       sleep 1
     done
     service docker start
   else
-    kube::log::fatal "Error: docker-bootstrap currently only supports ubuntu|debian|amzn|centos|systemd."
+    swarm::log::fatal "Error: docker-bootstrap currently only supports ubuntu|debian|amzn|centos|systemd."
   fi
 
-  kube::log::status "Restarted docker with the new flannel settings"
+  swarm::log::status "Restarted docker with the new flannel settings"
 }
 
 # Replace --mtu and --bip in systemd's docker.service file and restart
-kube::bootstrap::restart_docker_systemd(){
+swarm::bootstrap::restart_docker_systemd(){
 
   DOCKER_CONF=$(systemctl cat docker | head -1 | awk '{print $2}')
-  kube::helpers::backup_file ${DOCKER_CONF}
-  kube::helpers::replace_mtu_bip ${DOCKER_CONF} $(which docker)
+  swarm::helpers::backup_file ${DOCKER_CONF}
+  swarm::helpers::replace_mtu_bip ${DOCKER_CONF} $(which docker)
 
   # The docker0 bridge HAVE TO be deleted in between
-  kube::multinode::delete_bridge docker0
-  kube::multinode::delete_bridge docker0
+  swarm::multinode::delete_bridge docker0
+  swarm::multinode::delete_bridge docker0
 
   sed -i.bak 's/^\(MountFlags=\).*/\1shared/' ${DOCKER_CONF}
   systemctl daemon-reload
@@ -109,7 +109,7 @@ kube::bootstrap::restart_docker_systemd(){
   systemctl restart docker
 }
 
-kube::helpers::replace_mtu_bip(){
+swarm::helpers::replace_mtu_bip(){
   local DOCKER_CONF=$1
   local SEARCH_FOR=$2
 
