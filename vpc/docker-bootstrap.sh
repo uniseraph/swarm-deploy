@@ -52,9 +52,7 @@ swarm::bootstrap::restart_docker(){
 
   swarm::log::status "Restarting main docker daemon..."
 
-  if swarm::helpers::command_exists systemctl; then
-    swarm::bootstrap::restart_docker_systemd
-  elif swarm::helpers::command_exists yum; then
+  if swarm::helpers::command_exists yum ; then
     DOCKER_CONF="/etc/sysconfig/docker"
     swarm::helpers::backup_file ${DOCKER_CONF}
 
@@ -70,7 +68,6 @@ swarm::bootstrap::restart_docker(){
   elif swarm::helpers::command_exists apt-get; then
     DOCKER_CONF="/etc/default/docker"
     swarm::helpers::backup_file ${DOCKER_CONF}
-        
     # Is there an uncommented DOCKER_OPTS line at all?
     if [[ -z $(grep "DOCKER_OPTS" $DOCKER_CONF | grep -v "#") ]]; then
       echo "DOCKER_OPTS=\"--mtu=${FLANNEL_MTU} --bip=${FLANNEL_SUBNET} \"" >> ${DOCKER_CONF}
@@ -92,40 +89,18 @@ swarm::bootstrap::restart_docker(){
   swarm::log::status "Restarted docker with the new flannel settings"
 }
 
-# Replace --mtu and --bip in systemd's docker.service file and restart
-swarm::bootstrap::restart_docker_systemd(){
-
-  DOCKER_CONF=$(systemctl cat docker | head -1 | awk '{print $2}')
-  swarm::helpers::backup_file ${DOCKER_CONF}
-  swarm::helpers::replace_mtu_bip ${DOCKER_CONF} $(which docker)
-
-  # The docker0 bridge HAVE TO be deleted in between
-  swarm::multinode::delete_bridge docker0
-  swarm::multinode::delete_bridge docker0
-
-  sed -i.bak 's/^\(MountFlags=\).*/\1shared/' ${DOCKER_CONF}
-  systemctl daemon-reload
-  systemctl daemon-reload
-  systemctl restart docker
-}
 
 swarm::helpers::replace_mtu_bip(){
   local DOCKER_CONF=$1
   local SEARCH_FOR=$2
 
-  sed  -e ':a;N;$ s/\\\n/ /g;ba' -i $DOCKER_CONF
 
   # Assuming is a $SEARCH_FOR statement already, and we should append the options if they do not exist
   if [[ -z $(grep -- "--mtu=" $DOCKER_CONF) ]]; then
-    sed -e "s@$(grep "$SEARCH_FOR" $DOCKER_CONF)@$(grep "$SEARCH_FOR" $DOCKER_CONF) --mtu=${FLANNEL_MTU}@g" -i $DOCKER_CONF
+    sed -e "s@OPTIONS='@OPTIONS='--mtu=${MTU} '@g" -i $DOCKER_CONF
   fi
   if [[ -z $(grep -- "--bip=" $DOCKER_CONF) ]]; then
-    sed -e "s@$(grep "$SEARCH_FOR" $DOCKER_CONF)@$(grep "$SEARCH_FOR" $DOCKER_CONF) --bip=${FLANNEL_SUBNET}@g" -i $DOCKER_CONF
+    sed -e "s@OPTIONS='@OPTIONS='--bip=${BIP} '@g" -i $DOCKER_CONF
   fi
 
-  # Finds "--mtu=????" and replaces with "--mtu=${FLANNEL_MTU}"
-  # Also finds "--bip=??.??.??.??" and replaces with "--bip=${FLANNEL_SUBNET}"
-  # NOTE: This method replaces a whole 'mtu' or 'bip' expression. If it ends with a punctuation mark it will be truncated.
-  # Please add additional space before the punctuation mark to prevent this. For example: "--mtu=${FLANNEL_MTU} --bip=${FLANNEL_SUBNET} ".
-  sed -e "s@$(grep -o -- "--mtu=[[:graph:]]*" $DOCKER_CONF)@--mtu=${FLANNEL_MTU}@g;s@$(grep -o -- "--bip=[[:graph:]]*" $DOCKER_CONF)@--bip=${FLANNEL_SUBNET}@g" -i $DOCKER_CONF
 }
