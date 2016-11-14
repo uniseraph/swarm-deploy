@@ -18,7 +18,7 @@
 source $(dirname "${BASH_SOURCE}")/common.sh
 
 
-ZK_URL="zk:$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2181"
+ZK_URL="zk://$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2181"
 
 swarm::multinode::main
 
