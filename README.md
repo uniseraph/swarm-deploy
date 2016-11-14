@@ -118,7 +118,7 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 cd39dbdbfb86        swarm:1.2.5         "/swarm join --addr 1"   12 minutes ago      Up 12 minutes                           iZrj91tefvghte2u30htvzZ/stupefied_noether
 ```
 
-
+注意，swarm默认的心跳周期是1分钟，所以如果没看到节点或容器，可以等1分钟。
 
 
 ### 初始化swarm-agent 节点
