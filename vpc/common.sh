@@ -90,6 +90,8 @@ swarm::multinode::start_zookeeper() {
     -v /var/lib/zookeeper/datalog:/datalog \
     zookeeper:${ZK_VERSION} 
 
+  swarm::log::status "waiting 10 seconds for zk starting..."
+  sleep 10
 
 }
 
