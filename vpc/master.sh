@@ -18,7 +18,8 @@
 source $(dirname "${BASH_SOURCE}")/common.sh
 
 
-ZK_URL="zk://$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2181"
+#ZK_URL="zk://$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2181"
+ETDC_URL="etcd://$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2389"
 BIP=${BIP:-192.168.100.1/24}
 swarm::multinode::main
 
@@ -26,7 +27,8 @@ swarm::multinode::turndown
 
 swarm::bootstrap::bootstrap_daemon
 
-swarm::multinode::start_zookeeper
+swarm::multinode::start_etcd
+#swarm::multinode::start_zookeeper
 
 #swarm::multinode::start_flannel
 

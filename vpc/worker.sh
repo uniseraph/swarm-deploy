@@ -18,8 +18,8 @@
 source $(dirname "${BASH_SOURCE}")/common.sh
 
 # Make sure MASTER_IP is properly set
-if [[ -z ${ZK_URL} ]]; then
-    echo "Please export ZK_URL in your env"
+if [[ -z ${ECTD_URL} ]]; then
+    echo "Please export ETCD_URL in your env"
     exit 1
 fi
 
