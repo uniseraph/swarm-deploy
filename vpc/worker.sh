@@ -44,7 +44,7 @@ docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
       --net=host \
       ${IPAM_SUBNET_IMG} \
       ipam-subnet   \
-      --etcd-endpoints=http://localhost:2379 \
+      --etcd-endpoints=http://${MASTER_IP}:2379 \
       --etcd-prefix=/coreos.com/network
 #swarm::multinode::start_flannel
 
