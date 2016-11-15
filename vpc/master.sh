@@ -42,7 +42,8 @@ BIP=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
       --etcd-endpoints=http://${MASTER_IP}:2379 \
       --etcd-prefix=/coreos.com/network  |
       tail -n1 |
-      awk '{{print $5}}')
+      awk '{{print $5}}' |
+      tr -d '\r')
 
 
 #swarm::multinode::start_flannel
