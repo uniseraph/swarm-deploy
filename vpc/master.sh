@@ -37,7 +37,9 @@ curl -sSL http://${MASTER_IP}:2379/v2/keys/coreos.com/network/config -XPUT \
       -d value="{ \"Network\": \"${NETWORK}\", \"Backend\": {\"Type\": \"vxlan\"}}"
 
 
-docker run -ti --rm ${IPAM_SUBNET_IMG} \
+docker run -H ${BOOTSTRAP_DOCKER_SOCK} --rm \
+      --net=host \
+      ${IPAM_SUBNET_IMG} \
       ipam-subnet   \
       --etcd-endpoints=http://localhost:2379 \
       --etcd-prefix=/coreos.com/network
