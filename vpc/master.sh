@@ -37,7 +37,7 @@ curl -sSL http://${MASTER_IP}:2379/v2/keys/coreos.com/network/config -XPUT \
       -d value="{ \"Network\": \"${NETWORK}\", \"Backend\": {\"Type\": \"vxlan\"}}"
 
 
-docker run -H ${BOOTSTRAP_DOCKER_SOCK} --rm \
+docker -H ${BOOTSTRAP_DOCKER_SOCK} run --rm \
       --net=host \
       ${IPAM_SUBNET_IMG} \
       ipam-subnet   \
