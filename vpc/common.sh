@@ -37,6 +37,7 @@ swarm::multinode::main(){
   fi
 
 
+  IPAM_SUBNET_IMG=${IPAM_SUBNET_IMG:-uniseraph/ipam-subnet:0.1}
   CURRENT_PLATFORM=$(swarm::helpers::host_platform)
   ARCH=${ARCH:-${CURRENT_PLATFORM##*/}}
   swarm::log::status "ARCH is set to: ${ARCH}"

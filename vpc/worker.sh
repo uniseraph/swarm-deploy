@@ -17,10 +17,15 @@
 # Source common.sh
 source $(dirname "${BASH_SOURCE}")/common.sh
 
+
+if [[ -z ${MASTER_IP} ]]; then
+    echo "Please export MASTER_IP in your env"
+    exit 1
+fi
+
 # Make sure MASTER_IP is properly set
 if [[ -z ${ECTD_URL} ]]; then
-    echo "Please export ETCD_URL in your env"
-    exit 1
+    ETCD_URL=etcd://${MASTER_IP}:2379
 fi
 
 if [[ -z ${BIP} ]]; then
@@ -33,6 +38,14 @@ swarm::multinode::main
 swarm::multinode::turndown
 
 
+swarm::bootstrap::bootstrap_daemon
+
+docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
+      --net=host \
+      ${IPAM_SUBNET_IMG} \
+      ipam-subnet   \
+      --etcd-endpoints=http://localhost:2379 \
+      --etcd-prefix=/coreos.com/network
 #swarm::multinode::start_flannel
 
 swarm::bootstrap::restart_docker
