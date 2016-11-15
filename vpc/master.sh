@@ -20,8 +20,7 @@ source $(dirname "${BASH_SOURCE}")/common.sh
 MASTER_IP=$(ifconfig eth0 | grep inet | awk '{{print $2}}')
 #ZK_URL="zk://$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2181"
 ETCD_URL="etcd://${MASTER_IP}:2379"
-BIP=${BIP:-192.168.100.1/24}
-NETWORK=${NETWORK:-192.168.1.1/16}
+NETWORK=${NETWORK:-192.168.0.0/16}
 #IPAM_SUBNET_IMG=${IPAM_SUBNET_IMG:-uniseraph/ipam-subnet:0.1}
 
 swarm::multinode::main
@@ -36,13 +35,15 @@ swarm::multinode::start_etcd
 curl -sSL http://${MASTER_IP}:2379/v2/keys/coreos.com/network/config -XPUT \
       -d value="{ \"Network\": \"${NETWORK}\", \"Backend\": {\"Type\": \"vxlan\"}}"
 
-
-docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
+BIP=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
       --net=host \
       ${IPAM_SUBNET_IMG} \
       ipam-subnet   \
-      --etcd-endpoints=http://localhost:2379 \
-      --etcd-prefix=/coreos.com/network
+      --etcd-endpoints=http://${MASTER_IP}:2379 \
+      --etcd-prefix=/coreos.com/network  |
+      tail -n1 |
+      awk '{{print $5}}')
+
 
 #swarm::multinode::start_flannel
 

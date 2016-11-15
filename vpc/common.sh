@@ -57,7 +57,7 @@ swarm::multinode::main(){
   #FLANNEL_NETWORK=${FLANNEL_NETWORK:-"10.1.0.0/16"}
 
   #BIP=${SUBNET:-"192.168.1.1/24"}
-  swarm::log::status "BIP is set to: ${BIP}"
+  #swarm::log::status "BIP is set to: ${BIP}"
 
   MTU=${MTU:-"1472"}
   swarm::log::status "MTU is set to: ${MTU}"

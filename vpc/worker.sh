@@ -28,10 +28,10 @@ if [[ -z ${ECTD_URL} ]]; then
     ETCD_URL=etcd://${MASTER_IP}:2379
 fi
 
-if [[ -z ${BIP} ]]; then
-    echo "Please export BIP in your env"
-    exit 1
-fi
+#if [[ -z ${BIP} ]]; then
+#    echo "Please export BIP in your env"
+#    exit 1
+#fi
 
 swarm::multinode::main
 
@@ -40,12 +40,14 @@ swarm::multinode::turndown
 
 swarm::bootstrap::bootstrap_daemon
 
-docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
+BIP=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
       --net=host \
       ${IPAM_SUBNET_IMG} \
       ipam-subnet   \
       --etcd-endpoints=http://${MASTER_IP}:2379 \
-      --etcd-prefix=/coreos.com/network
+      --etcd-prefix=/coreos.com/network  |
+      tail -n1 |
+      awk '{{print $5}}')
 #swarm::multinode::start_flannel
 
 swarm::bootstrap::restart_docker
