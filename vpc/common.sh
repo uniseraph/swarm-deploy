@@ -37,6 +37,7 @@ swarm::multinode::main(){
   fi
 
 
+  IPAM_SUBNET_IMG=${IPAM_SUBNET_IMG:-uniseraph/ipam-subnet:0.1}
   CURRENT_PLATFORM=$(swarm::helpers::host_platform)
   ARCH=${ARCH:-${CURRENT_PLATFORM##*/}}
   swarm::log::status "ARCH is set to: ${ARCH}"
@@ -45,10 +46,10 @@ swarm::multinode::main(){
   swarm::log::status "SWARM_VERSION is set to: ${SWARM_VERSION}"
   ETCD_VERSION=${ETCD_VERSION:-"3.0.4"}
   swarm::log::status "ETCD_VERSION is set to: ${ETCD_VERSION}"
-  ZK_VERSION=${ZK_VERSION:-3.4.9}
-  swarm::log::status "ZK_VERSION is set to: ${ZK_VERSION}"
+  #ZK_VERSION=${ZK_VERSION:-3.4.9}
+  #swarm::log::status "ZK_VERSION is set to: ${ZK_VERSION}"
 
-  swarm::log::status "ZK_URL  is set to: ${ZK_URL}"
+  #swarm::log::status "ZK_URL  is set to: ${ZK_URL}"
 
   #FLANNEL_VERSION=${FLANNEL_VERSION:-"v0.6.1"}
   #FLANNEL_IPMASQ=${FLANNEL_IPMASQ:-"true"}
@@ -56,7 +57,7 @@ swarm::multinode::main(){
   #FLANNEL_NETWORK=${FLANNEL_NETWORK:-"10.1.0.0/16"}
 
   #BIP=${SUBNET:-"192.168.1.1/24"}
-  swarm::log::status "BIP is set to: ${BIP}"
+  #swarm::log::status "BIP is set to: ${BIP}"
 
   MTU=${MTU:-"1472"}
   swarm::log::status "MTU is set to: ${MTU}"
@@ -77,23 +78,23 @@ swarm::multinode::main(){
 }
 
 
-swarm::multinode::start_zookeeper() {
+#swarm::multinode::start_zookeeper() {
 
-  swarm::log::status "Launching zookeeper..."
+#  swarm::log::status "Launching zookeeper..."
 
   # TODO: Remove the 4001 port as it is deprecated
-  docker ${BOOTSTRAP_DOCKER_PARAM} run -d \
-    --name swarm_zk_$(swarm::helpers::small_sha) \
-    --restart=always \
-    --net=host  \
-    -v /var/lib/zookeeper/data:/data \
-    -v /var/lib/zookeeper/datalog:/datalog \
-    zookeeper:${ZK_VERSION} 
+#  docker ${BOOTSTRAP_DOCKER_PARAM} run -d \
+#    --name swarm_zk_$(swarm::helpers::small_sha) \
+#    --restart=always \
+#    --net=host  \
+#    -v /var/lib/zookeeper/data:/data \
+#    -v /var/lib/zookeeper/datalog:/datalog \
+#    zookeeper:${ZK_VERSION} 
 
-  swarm::log::status "waiting 10 seconds for zk starting..."
-  sleep 10
+#  swarm::log::status "waiting 10 seconds for zk starting..."
+#  sleep 10
 
-}
+#}
 
 
 # Start etcd on the master node
@@ -104,9 +105,9 @@ swarm::multinode::start_etcd() {
   # TODO: Remove the 4001 port as it is deprecated
   docker ${BOOTSTRAP_DOCKER_PARAM} run -d \
     --name swarm_etcd_$(swarm::helpers::small_sha) \
-    --restart=${RESTART_POLICY} \
-    ${ETCD_NET_PARAM} \
-    -v /var/lib/swarmlet/etcd:/var/etcd \
+    --restart=always \
+    --net=host \
+    -v /var/lib/swarm/etcd:/var/etcd \
     gcr.io/google_containers/etcd-${ARCH}:${ETCD_VERSION} \
     /usr/local/bin/etcd \
       --listen-client-urls=http://0.0.0.0:2379,http://0.0.0.0:4001 \
@@ -184,7 +185,7 @@ swarm::multinode::start_swarm_agent() {
     swarm:${SWARM_VERSION} \
     join \
     --addr   ${DOCKER_LISTEN_URL}\
-    ${ZK_URL}
+    ${ETCD_URL}
 
 }
 # Start swarmlet first and then the master components as pods
@@ -202,7 +203,7 @@ swarm::multinode::start_swarm_master() {
     swarm:${SWARM_VERSION} \
     join \
     --addr   ${DOCKER_LISTEN_URL}\
-    ${ZK_URL}
+    ${ETCD_URL}
 
   sleep 2
 
@@ -213,7 +214,7 @@ swarm::multinode::start_swarm_master() {
     swarm:${SWARM_VERSION} \
     manage \
     --host=${SWARM_LISTEN_URL} \
-    ${ZK_URL}
+    ${ETCD_URL}
 }
 
 

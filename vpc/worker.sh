@@ -17,22 +17,37 @@
 # Source common.sh
 source $(dirname "${BASH_SOURCE}")/common.sh
 
-# Make sure MASTER_IP is properly set
-if [[ -z ${ZK_URL} ]]; then
-    echo "Please export ZK_URL in your env"
+
+if [[ -z ${MASTER_IP} ]]; then
+    echo "Please export MASTER_IP in your env"
     exit 1
 fi
 
-if [[ -z ${BIP} ]]; then
-    echo "Please export BIP in your env"
-    exit 1
+# Make sure MASTER_IP is properly set
+if [[ -z ${ECTD_URL} ]]; then
+    ETCD_URL=etcd://${MASTER_IP}:2379
 fi
+
+#if [[ -z ${BIP} ]]; then
+#    echo "Please export BIP in your env"
+#    exit 1
+#fi
 
 swarm::multinode::main
 
 swarm::multinode::turndown
 
 
+swarm::bootstrap::bootstrap_daemon
+
+BIP=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
+      --net=host \
+      ${IPAM_SUBNET_IMG} \
+      ipam-subnet   \
+      --etcd-endpoints=http://${MASTER_IP}:2379 \
+      --etcd-prefix=/coreos.com/network  |
+      tail -n1 |
+      tr -d '\r')
 #swarm::multinode::start_flannel
 
 swarm::bootstrap::restart_docker

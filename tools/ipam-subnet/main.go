@@ -98,6 +98,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	log.Info(l.Subnet.String())
-
+	l.Subnet.IP = l.Subnet.IP + 1
+	fmt.Print(l.Subnet.String())
 }

@@ -52,6 +52,7 @@ swarm::bootstrap::restart_docker(){
 
   swarm::log::status "Restarting main docker daemon..."
 
+  swarm::log::status "BIP is set to: ${BIP}"
   if swarm::helpers::command_exists yum ; then
     DOCKER_CONF="/etc/sysconfig/docker"
     swarm::helpers::backup_file ${DOCKER_CONF}
