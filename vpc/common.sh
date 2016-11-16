@@ -288,7 +288,7 @@ swarm::vpc::create_vroute_entry(){
    swarm::log::status "RouteTableId is ${RouteTableId} ... "
    docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
      uniseraph/aliyuncli aliyuncli ecs CreateRouteEntry \
-      --DestinationCidrBlock ${BIP} \
+      --DestinationCidrBlock ${SUBNET} \
       --NextHopId ${InstanceId} \
       --RouteTableId ${RouteTableId}
 }

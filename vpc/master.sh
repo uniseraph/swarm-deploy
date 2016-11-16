@@ -44,17 +44,20 @@ curl -sSL http://${MASTER_IP}:2379/v2/keys/coreos.com/network/config -XPUT \
 AccessKey=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run  -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
   uniseraph/aliyuncli \
   aliyuncli configure get aliyun_access_key_id | \
-  awk '{{print $3}}')
+  awk '{{print $3}}' |
+  tr -d '\r')
 
 AccessSecret=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
   uniseraph/aliyuncli \
   aliyuncli configure get aliyun_access_key_secret | \
-  awk '{{print $3}}')
+  awk '{{print $3}}' |
+  tr -d '\r')
 
 Region=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
   uniseraph/aliyuncli \
   aliyuncli configure get region | \
-  awk '{{print $3}}')
+  awk '{{print $3}}' |
+  tr -d '\r')
 
 Output=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
   uniseraph/aliyuncli \
@@ -65,14 +68,19 @@ curl -sSL http://${MASTER_IP}:2379/v2/keys/cores.com/aliyuncli/config -XPUT \
 
 
 
-BIP=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
+LINE=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
       --net=host \
       ${IPAM_SUBNET_IMG} \
       ipam-subnet   \
       --etcd-endpoints=http://${MASTER_IP}:2379 \
       --etcd-prefix=/coreos.com/network  |
-      tail -n1 |
-      tr -d '\r')
+      tail -n1 | tr -d '\r')
+SUBNET=$(echo LINE | awk '{{print $1}}')
+BIP=$(echo LINE | awk '{{print $2}}'  )
+
+swarm::log:status "SUBNET is ${SUBNET}"
+
+
 
 
 #swarm::multinode::start_flannel

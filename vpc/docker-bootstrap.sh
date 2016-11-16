@@ -59,7 +59,7 @@ swarm::bootstrap::restart_docker(){
 
     # Is there an uncommented OPTIONS line at all?
     if [[ -z $(grep "OPTIONS" ${DOCKER_CONF} | grep -v "#") ]]; then
-      echo "OPTIONS=\"--mtu=${FLANNEL_MTU} --bip=${FLANNEL_SUBNET} \"" >> ${DOCKER_CONF}
+      echo "OPTIONS=\"--mtu=${MTU} --bip=${SUBNET} \"" >> ${DOCKER_CONF}
     else
       swarm::helpers::replace_mtu_bip ${DOCKER_CONF} "OPTIONS"
     fi
