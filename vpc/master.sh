@@ -64,9 +64,9 @@ Output=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli
   aliyuncli configure get output | \
   awk '{{print $3}}' |
   tr -d '\r' )
-ALIYUNCLI_CONFIG="{ \"AccessKey\": \"${AccessKey}\" , \"AccessSecret\" : \"${AccessSecret}\" , \"Region\":\"${Region}\" ,  \"Output\":\"${Output}\" }"
+
 curl -sSL http://${MASTER_IP}:2379/v2/keys/cores.com/aliyuncli/config -XPUT \
-      -d value=${ALIYUNCLI_CONFIG}
+      -d value="{ \"AccessKey\": \"${AccessKey}\" , \"AccessSecret\" : \"${AccessSecret}\" , \"Region\":\"${Region}\" ,  \"Output\":\"${Output}\" }"
 
 
 
