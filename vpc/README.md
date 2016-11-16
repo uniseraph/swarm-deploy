@@ -38,7 +38,7 @@ netstat -anlp | grep LISTEN | grep docker
 ### 初始化swarm-master节点
 
 ```
-cd /opt/swarm/swarm-deploy/vpc && bash master.sh
+cd /opt/swarm-deploy/vpc && bash master.sh
 [root@iZrj91tefvghte2u30htvzZ vpc]# bash master.sh
 +++ [1114 17:26:35] ARCH is set to: amd64
 +++ [1114 17:26:35] SWARM_VERSION is set to: 1.2.5
