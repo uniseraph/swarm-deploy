@@ -75,7 +75,8 @@ LINE=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
       ${IPAM_SUBNET_IMG} \
       ipam-subnet   \
       --etcd-endpoints=http://${MASTER_IP}:2379 \
-      --etcd-prefix=/coreos.com/network  |
+      --etcd-prefix=/coreos.com/network \ 
+      --local-ip=${MASTER_IP} |
       tail -n1 | tr -d '\r')
 SUBNET=$(echo ${LINE} | awk '{{print $1}}')
 BIP=$(echo ${LINE} | awk '{{print $2}}'  )

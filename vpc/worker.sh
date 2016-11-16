@@ -40,12 +40,15 @@ swarm::multinode::turndown
 
 swarm::bootstrap::bootstrap_daemon
 
+
+LOCAL_IP=$(ifconfig eth0  | grep inet | awk '{{print $2}}' )
 LINE=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
       --net=host \
       ${IPAM_SUBNET_IMG} \
       ipam-subnet   \
       --etcd-endpoints=http://${MASTER_IP}:2379 \
-      --etcd-prefix=/coreos.com/network  |
+      --etcd-prefix=/coreos.com/network \
+      --local-ip=${LOCAL_IP} |
       tail -n1 | tr -d '\r')
 
 echo "LINE=${LINE}"
