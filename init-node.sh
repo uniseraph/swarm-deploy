@@ -4,7 +4,7 @@ echo "deleting all containers ..."
 
 docker rm -f `docker ps -aq`
 yum remove -y   docker
-yum install -y  docker
+yum install -y  docker jq
 
 
 echo "STORAGE_DRIVER=overlay" > /etc/sysconfig/docker-storage-setup
