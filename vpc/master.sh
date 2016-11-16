@@ -75,10 +75,8 @@ LINE=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
       --etcd-endpoints=http://${MASTER_IP}:2379 \
       --etcd-prefix=/coreos.com/network  |
       tail -n1 | tr -d '\r')
-SUBNET=$(echo LINE | awk '{{print $1}}')
-BIP=$(echo LINE | awk '{{print $2}}'  )
-
-swarm::log:status "SUBNET is ${SUBNET}"
+SUBNET=$(echo ${LINE} | awk '{{print $1}}')
+BIP=$(echo ${LINE} | awk '{{print $2}}'  )
 
 
 
