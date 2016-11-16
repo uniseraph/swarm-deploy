@@ -104,8 +104,7 @@ cd39dbdbfb86        swarm:1.2.5         "/swarm join --addr 1"   12 minutes ago 
 
 ```
 cd /opt/swarm-deploy/vpc 
-export ZK_URL=zk://10.24.136.254:2181  ＃注意zk地址 , swarm使用zk做节点发现，所有agent都必须注册到zk上
-export BIP=192.168.250.1/24    #注意与其他服务器的BIP要分开， 不能冲突
+export MASTER_IP=10.24.136.254  
 bash worker.sh
 ```
 
