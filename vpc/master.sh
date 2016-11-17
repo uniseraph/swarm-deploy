@@ -36,7 +36,7 @@ swarm::multinode::turndown
 swarm::bootstrap::bootstrap_daemon
 
 swarm::multinode::start_etcd
-swarm::multinode::start_zookeeper
+#swarm::multinode::start_zookeeper
 
 curl -sSL http://${MASTER_IP}:2379/v2/keys/coreos.com/network/config -XPUT \
       -d value="{ \"Network\": \"${NETWORK}\", \"Backend\": {\"Type\": \"vxlan\"}}"
