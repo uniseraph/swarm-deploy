@@ -81,7 +81,7 @@ curl -sSL http://${MASTER_IP}:2379/v2/keys/cores.com/aliyuncli/config -XPUT \
 #SUBNET=$(echo ${LINE} | awk '{{print $1}}')
 #BIP=$(echo ${LINE} | awk '{{print $2}}'  )
 
-swarm::common:get_subnet_bip $(MASTER_IP) ${MASTER_IP}
+swarm::common::get_subnet_bip ${MASTER_IP} ${MASTER_IP}
 
 
 #swarm::multinode::start_flannel
