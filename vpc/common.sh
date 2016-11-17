@@ -382,3 +382,21 @@ swarm::log::fatal() {
   done
   exit 1
 }
+
+
+swarm::common::get_subnet_bip(){
+  S_IP=$1
+  C_IP=$2
+
+
+  LINE=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
+      --net=host \
+      ${IPAM_SUBNET_IMG} \
+      ipam-subnet   \
+      --etcd-endpoints=http://${S_IP}:2379 \
+      --etcd-prefix=/coreos.com/network \
+      --local-ip=${C_IP} |
+      tail -n1 | tr -d '\r')
+  SUBNET=$(echo ${LINE} | awk '{{print $1}}')
+  BIP=$(echo ${LINE} | awk '{{print $2}}'  )
+}
