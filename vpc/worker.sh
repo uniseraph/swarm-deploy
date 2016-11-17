@@ -51,9 +51,11 @@ LINE=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
       --local-ip=${LOCAL_IP} |
       tail -n1 | tr -d '\r')
 
-echo "LINE=${LINE}"
 SUBNET=$(echo ${LINE} | awk '{{print $1}}')
 BIP=$(echo ${LINE} | awk '{{print $2}}'  )
+swarm::log::status "SUBNET=${SUBNET}"
+swarm::log::status "BIP=${BIP}"
+
 
 swarm::bootstrap::restart_docker
 
@@ -67,7 +69,7 @@ if [ ! -d "/etc/swarm/aliyuncli" ]; then
 
   ALIYUNCLI_CONFIG=$(curl -sSL http://${MASTER_IP}:2379/v2/keys/cores.com/aliyuncli/config   | jq .node.value   |  sed -e 's/^.//' | sed -e 's/.$//' | tr -d "\\")
   echo "${ALIYUNCLI_CONFIG}" > /tmp/aliyuncli_config
-  AccessKey=$(cat /tmp/aliyuncli_config | jq .AccessKey | tr -d '"' )
+  AccessKey=$( echo ${ALIYUNCLI_CONFIG} |  jq .AccessKey | tr -d '"' )
   AccessSecret=$( echo ${ALIYUNCLI_CONFIG} | jq  .AccessSecret | tr -d '"')
   Region=$( echo ${ALIYUNCLI_CONFIG} | jq .Region | tr -d '"')
   Output=$( echo ${ALIYUNCLI_CONFIG} | jq .Output | tr -d '"')
