@@ -42,20 +42,21 @@ swarm::bootstrap::bootstrap_daemon
 
 
 LOCAL_IP=$(ifconfig eth0  | grep inet | awk '{{print $2}}' )
-LINE=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
-      --net=host \
-      ${IPAM_SUBNET_IMG} \
-      ipam-subnet   \
-      --etcd-endpoints=http://${MASTER_IP}:2379 \
-      --etcd-prefix=/coreos.com/network \
-      --local-ip=${LOCAL_IP} |
-      tail -n1 | tr -d '\r')
+#LINE=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
+#      --net=host \
+#      ${IPAM_SUBNET_IMG} \
+#      ipam-subnet   \
+#      --etcd-endpoints=http://${MASTER_IP}:2379 \
+#      --etcd-prefix=/coreos.com/network \
+#      --local-ip=${LOCAL_IP} |
+#      tail -n1 | tr -d '\r')
 
-SUBNET=$(echo ${LINE} | awk '{{print $1}}')
-BIP=$(echo ${LINE} | awk '{{print $2}}'  )
-swarm::log::status "SUBNET=${SUBNET}"
-swarm::log::status "BIP=${BIP}"
+#SUBNET=$(echo ${LINE} | awk '{{print $1}}')
+#BIP=$(echo ${LINE} | awk '{{print $2}}'  )
+#swarm::log::status "SUBNET=${SUBNET}"
+#swarm::log::status "BIP=${BIP}"
 
+swarm::common::get_subnet_bip ${MASTER_IP} ${LOCAL_IP}
 
 swarm::bootstrap::restart_docker
 
