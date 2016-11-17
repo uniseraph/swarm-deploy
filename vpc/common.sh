@@ -440,7 +440,7 @@ Region=$(docker -H ${BOOTSTRAP_DOCKER_SOCK}   run -ti --rm -v /etc/swarm/aliyunc
   awk '{{print $3}}' |
   tr -d '\r')
 
-Output=$(dockeri -H ${BOOTSTRAP_DOCKER_SOCK}  run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+Output=$(docker -H ${BOOTSTRAP_DOCKER_SOCK}  run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
   ${ALIYUNCLI_IMG} \
   aliyuncli configure get output | \
   awk '{{print $3}}' |

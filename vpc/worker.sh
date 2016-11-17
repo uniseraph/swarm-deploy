@@ -37,7 +37,7 @@ swarm::multinode::main
 
 swarm::multinode::turndown
 
-#swarm::bootstrap::bootstrap_daemon
+swarm::bootstrap::bootstrap_daemon
 
 swarm::common::get_subnet_bip ${MASTER_IP} ${LOCAL_IP}
 
