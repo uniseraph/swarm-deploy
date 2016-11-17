@@ -174,6 +174,7 @@ swarm::multinode::start_flannel() {
 swarm::multinode::start_swarm_agent() {
   swarm::log::status "Launching swarm agent ..."
 
+  DIS_URL=$1
   DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
   SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
 
@@ -185,12 +186,15 @@ swarm::multinode::start_swarm_agent() {
     swarm:${SWARM_VERSION} \
     join \
     --addr   ${DOCKER_LISTEN_URL} \
-    ${ETCD_URL}
+    ${DIS_URL}
 
 }
 # Start swarmlet first and then the master components as pods
 swarm::multinode::start_swarm_master() {
   swarm::log::status "Launching swarm master ..."
+
+  DIS_URL=$1
+
 
   DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
   SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
@@ -203,7 +207,7 @@ swarm::multinode::start_swarm_master() {
     swarm:${SWARM_VERSION} \
     join \
     --addr   ${DOCKER_LISTEN_URL}\
-    ${ZK_URL}
+    ${DIS_URL}
     #    ${ETCD_URL}
 
   sleep 2
@@ -215,7 +219,7 @@ swarm::multinode::start_swarm_master() {
     swarm:${SWARM_VERSION} \
     manage \
     --host=${SWARM_LISTEN_URL} \
-    ${ZK_URL}
+    ${DIS_URL}
     #${ETCD_URL}
 }
 

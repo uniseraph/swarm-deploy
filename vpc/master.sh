@@ -91,7 +91,7 @@ swarm::bootstrap::restart_docker
 
 #swarm::multinode::start_k8s_master
 
-swarm::multinode::start_swarm_master
+swarm::multinode::start_swarm_master ${ZK_URL}
 
 
 swarm::vpc::create_vroute_entry
