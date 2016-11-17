@@ -281,19 +281,19 @@ swarm::vpc::create_vroute_entry(){
    swarm::log::status "VpcId is ${VpcId} ... "
    swarm::log::status "InstanceId is ${InstanceId} ... "
 
-   VRouterId=$( docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
+   VRouterId=$( docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
      ${ALIYUNCLI_IMG} aliyuncli ecs DescribeVpcs \
      --VpcId=${Vpd_Id} | jq .Vpcs[][].VRouterId )
 
    swarm::log::status "VRouterId is ${VRouterId} ... "
-   RouteTableId=$(docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
+   RouteTableId=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
      ${ALIYUNCLI_IMG} aliyuncli ecs DescribeVRouters \
      --VRouterId=vrt-j6cik70l058ax7co687a6 | \
      jq .VRouters[][].RouteTableIds.RouteTableId[] | \
      tr -d '\"')
 
    swarm::log::status "RouteTableId is ${RouteTableId} ... "
-   docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
+   docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
      ${ALIYUNCLI_IMG} aliyuncli ecs CreateRouteEntry \
       --DestinationCidrBlock ${SUBNET} \
       --NextHopId ${InstanceId} \
