@@ -49,7 +49,7 @@ swarm::multinode::main(){
   ZK_VERSION=${ZK_VERSION:-3.4.9}
   swarm::log::status "ZK_VERSION is set to: ${ZK_VERSION}"
 
-  ALIYUNCLI_IMG=${ALIYUNCLI_IMG:-"${ALIYUNCLI_IMG}"}
+  ALIYUNCLI_IMG=${ALIYUNCLI_IMG:-"uniseraph/aliyuncli"}
   #swarm::log::status "ZK_URL  is set to: ${ZK_URL}"
 
   #FLANNEL_VERSION=${FLANNEL_VERSION:-"v0.6.1"}
