@@ -32,6 +32,7 @@ swarm::bootstrap::bootstrap_daemon
 swarm::multinode::start_etcd
 if [ ! -d "/etc/swarm/aliyuncli" ]; then
   # Control will enter here if $DIRECTORY doesn't exist.
+  swarm::log::status "init and register aliyunconfig at etcd..."
   docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
     ${ALIYUNCLI_IMG} aliyuncli configure
   swarm::common::register_aliyuncli_config
@@ -39,8 +40,6 @@ fi
 
 curl -sSL http://${MASTER_IP}:2379/v2/keys/coreos.com/network/config -XPUT \
       -d value="{ \"Network\": \"${NETWORK}\", \"Backend\": {\"Type\": \"vxlan\"}}"
-
-swarm::common::register_aliyuncli_config
 
 swarm::common::get_subnet_bip ${MASTER_IP} ${MASTER_IP}
 

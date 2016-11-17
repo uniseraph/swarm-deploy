@@ -192,7 +192,6 @@ swarm::multinode::start_swarm_agent() {
 }
 # Start swarmlet first and then the master components as pods
 swarm::multinode::start_swarm_master() {
-  swarm::log::status "Launching swarm master ..."
 
   DIS_URL=$1
 
@@ -200,7 +199,7 @@ swarm::multinode::start_swarm_master() {
   DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
   SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
 
-  swarm::log::status "Launching swarm master , listening at ${SWARM_LISTEN_URL} ..."
+  swarm::log::status "Launching swarm master at ${SWARM_LISTEN_URL} ..."
   docker run -d \
     --net=host \
     --pid=host \
@@ -275,6 +274,7 @@ swarm::multinode::make_shared_swarmlet_dir() {
 }
 
 swarm::vpc::create_vroute_entry(){
+   swarm::log::status "Add custom route ..."
    VpcId=$(curl 100.100.100.200/latest/meta-data/vpc-id)
    InstanceId=$(curl 100.100.100.200/latest/meta-data/instance-id)
 
