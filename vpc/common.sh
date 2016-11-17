@@ -46,8 +46,8 @@ swarm::multinode::main(){
   swarm::log::status "SWARM_VERSION is set to: ${SWARM_VERSION}"
   ETCD_VERSION=${ETCD_VERSION:-"3.0.4"}
   swarm::log::status "ETCD_VERSION is set to: ${ETCD_VERSION}"
-  #ZK_VERSION=${ZK_VERSION:-3.4.9}
-  #swarm::log::status "ZK_VERSION is set to: ${ZK_VERSION}"
+  ZK_VERSION=${ZK_VERSION:-3.4.9}
+  swarm::log::status "ZK_VERSION is set to: ${ZK_VERSION}"
 
   #swarm::log::status "ZK_URL  is set to: ${ZK_URL}"
 
@@ -184,7 +184,7 @@ swarm::multinode::start_swarm_agent() {
     --restart=always \
     swarm:${SWARM_VERSION} \
     join \
-    --addr   ${DOCKER_LISTEN_URL}\
+    --addr   ${DOCKER_LISTEN_URL} \
     ${ETCD_URL}
 
 }
