@@ -7,6 +7,7 @@ automations.
 
 
 ## 在阿里云海外节点创建一个vpc 虚拟机，注意要选择 centos7u2的基础镜像
+略
 
 ## 登录虚拟机，获取swarm-deploy工具
 
@@ -38,9 +39,9 @@ netstat -anlp | grep LISTEN | grep docker
 ### 初始化swarm-master节点
 
 ```
-cd /opt/swarm/swarm-deploy/vpc && bash master.sh
+cd /opt/swarm-deploy/vpc && bash master.sh
 ```
-
+在第一次初始化master节点时，需要调用阿里云VPC的自定义路由接口，所以会要求输入阿里云accesskey和accessSecret以及region相关信息。
 
 在这台ECS上，起了多个服务，组成了一个master*1 node*1的swarm 集群。
 
@@ -102,6 +103,7 @@ cd39dbdbfb86        swarm:1.2.5         "/swarm join --addr 1"   12 minutes ago 
 
 创建虚拟机与初始化节点步骤于swarm-master相同。
 
+初始化agent环境
 ```
 cd /opt/swarm-deploy/vpc 
 export MASTER_IP=10.24.136.254  
