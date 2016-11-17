@@ -281,19 +281,19 @@ swarm::vpc::create_vroute_entry(){
    swarm::log::status "VpcId is ${VpcId} ... "
    swarm::log::status "InstanceId is ${InstanceId} ... "
 
-   VRouterId=$( docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
+   VRouterId=$( docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
      ${ALIYUNCLI_IMG} aliyuncli ecs DescribeVpcs \
      --VpcId=${Vpd_Id} | jq .Vpcs[][].VRouterId )
 
    swarm::log::status "VRouterId is ${VRouterId} ... "
-   RouteTableId=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
+   RouteTableId=$(docker  run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
      ${ALIYUNCLI_IMG} aliyuncli ecs DescribeVRouters \
      --VRouterId=vrt-j6cik70l058ax7co687a6 | \
      jq .VRouters[][].RouteTableIds.RouteTableId[] | \
      tr -d '\"')
 
    swarm::log::status "RouteTableId is ${RouteTableId} ... "
-   docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
+   docker  run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
      ${ALIYUNCLI_IMG} aliyuncli ecs CreateRouteEntry \
       --DestinationCidrBlock ${SUBNET} \
       --NextHopId ${InstanceId} \
@@ -419,25 +419,25 @@ swarm::common::register_aliyuncli_config(){
    #         -d value="{ \"Network\": \"${NETWORK}\", \"Backend\": {\"Type\": \"vxlan\"}}"
 
 
-AccessKey=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run  -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+AccessKey=$(docker  run  -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
   ${ALIYUNCLI_IMG} \
   aliyuncli configure get aliyun_access_key_id | \
   awk '{{print $3}}' |
   tr -d '\r')
 
-AccessSecret=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+AccessSecret=$(docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
   ${ALIYUNCLI_IMG} \
   aliyuncli configure get aliyun_access_key_secret | \
   awk '{{print $3}}' |
   tr -d '\r')
 
-Region=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+Region=$(docker  run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
   ${ALIYUNCLI_IMG} \
   aliyuncli configure get region | \
   awk '{{print $3}}' |
   tr -d '\r')
 
-Output=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+Output=$(docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
   ${ALIYUNCLI_IMG} \
   aliyuncli configure get output | \
   awk '{{print $3}}' |
