@@ -284,7 +284,8 @@ swarm::vpc::create_vroute_entry(){
    VRouterId=$( docker ${BOOTSTRAP_DOCKER_PARAM} run \
      --net=host -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
      ${ALIYUNCLI_IMG} aliyuncli ecs DescribeVpcs \
-     --VpcId ${VpcId} | jq .Vpcs[][].VRouterId )
+     --VpcId ${VpcId} | jq .Vpcs[][].VRouterId | \
+     tr -d '\"' )
 
    swarm::log::status "VRouterId is ${VRouterId} ... "
    RouteTableId=$(docker ${BOOTSTRAP_DOCKER_PARAM} run \
