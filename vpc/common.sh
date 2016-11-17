@@ -419,25 +419,25 @@ swarm::common::register_aliyuncli_config(){
    #         -d value="{ \"Network\": \"${NETWORK}\", \"Backend\": {\"Type\": \"vxlan\"}}"
 
 
-AccessKey=$(docker  run  -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+AccessKey=$(docker -H ${BOOTSTRAP_DOCKER_SOCK}  run  -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
   ${ALIYUNCLI_IMG} \
   aliyuncli configure get aliyun_access_key_id | \
   awk '{{print $3}}' |
   tr -d '\r')
 
-AccessSecret=$(docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+AccessSecret=$(docker -H ${BOOTSTRAP_DOCKER_SOCK}  run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
   ${ALIYUNCLI_IMG} \
   aliyuncli configure get aliyun_access_key_secret | \
   awk '{{print $3}}' |
   tr -d '\r')
 
-Region=$(docker  run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+Region=$(docker -H ${BOOTSTRAP_DOCKER_SOCK}   run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
   ${ALIYUNCLI_IMG} \
   aliyuncli configure get region | \
   awk '{{print $3}}' |
   tr -d '\r')
 
-Output=$(docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+Output=$(dockeri -H ${BOOTSTRAP_DOCKER_SOCK}  run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
   ${ALIYUNCLI_IMG} \
   aliyuncli configure get output | \
   awk '{{print $3}}' |

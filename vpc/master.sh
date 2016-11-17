@@ -33,7 +33,7 @@ swarm::multinode::start_etcd
 if [ ! -d "/etc/swarm/aliyuncli" ]; then
   # Control will enter here if $DIRECTORY doesn't exist.
   swarm::log::status "init and register aliyunconfig at etcd..."
-  docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
+  docker run -H ${BOOTSTRAP_DOCKER_SOCK} -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
     ${ALIYUNCLI_IMG} aliyuncli configure
   swarm::common::register_aliyuncli_config
 fi
