@@ -41,7 +41,7 @@ swarm::multinode::start_etcd
 curl -sSL http://${MASTER_IP}:2379/v2/keys/coreos.com/network/config -XPUT \
       -d value="{ \"Network\": \"${NETWORK}\", \"Backend\": {\"Type\": \"vxlan\"}}"
 
-swarm::common:register_aliyuncli_config
+swarm::common::register_aliyuncli_config
 #AccessKey=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run  -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
 #  uniseraph/aliyuncli \
 #  aliyuncli configure get aliyun_access_key_id | \
