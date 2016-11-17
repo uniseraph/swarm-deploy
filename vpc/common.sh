@@ -78,23 +78,23 @@ swarm::multinode::main(){
 }
 
 
-#swarm::multinode::start_zookeeper() {
+swarm::multinode::start_zookeeper() {
 
-#  swarm::log::status "Launching zookeeper..."
+  swarm::log::status "Launching zookeeper..."
 
   # TODO: Remove the 4001 port as it is deprecated
-#  docker ${BOOTSTRAP_DOCKER_PARAM} run -d \
-#    --name swarm_zk_$(swarm::helpers::small_sha) \
-#    --restart=always \
-#    --net=host  \
-#    -v /var/lib/zookeeper/data:/data \
-#    -v /var/lib/zookeeper/datalog:/datalog \
-#    zookeeper:${ZK_VERSION} 
+  docker ${BOOTSTRAP_DOCKER_PARAM} run -d \
+    --name swarm_zk_$(swarm::helpers::small_sha) \
+    --restart=always \
+    --net=host  \
+    -v /var/lib/zookeeper/data:/data \
+    -v /var/lib/zookeeper/datalog:/datalog \
+    zookeeper:${ZK_VERSION} 
 
-#  swarm::log::status "waiting 10 seconds for zk starting..."
-#  sleep 10
+  swarm::log::status "waiting 10 seconds for zk starting..."
+  sleep 10
 
-#}
+}
 
 
 # Start etcd on the master node
@@ -203,7 +203,8 @@ swarm::multinode::start_swarm_master() {
     swarm:${SWARM_VERSION} \
     join \
     --addr   ${DOCKER_LISTEN_URL}\
-    ${ETCD_URL}
+    ${ZK_URL}
+    #    ${ETCD_URL}
 
   sleep 2
 
@@ -214,7 +215,8 @@ swarm::multinode::start_swarm_master() {
     swarm:${SWARM_VERSION} \
     manage \
     --host=${SWARM_LISTEN_URL} \
-    ${ETCD_URL}
+    ${ZK_URL}
+    #${ETCD_URL}
 }
 
 

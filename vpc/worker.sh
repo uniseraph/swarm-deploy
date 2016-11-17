@@ -27,6 +27,9 @@ fi
 if [[ -z ${ECTD_URL} ]]; then
     ETCD_URL=etcd://${MASTER_IP}:2379
 fi
+if [[ -z ${ZK_URL} ]]; then
+    ETCD_URL=zk://${MASTER_IP}:2181
+fi
 
 #if [[ -z ${BIP} ]]; then
 #    echo "Please export BIP in your env"
