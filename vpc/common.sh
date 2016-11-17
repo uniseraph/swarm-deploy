@@ -110,8 +110,8 @@ swarm::multinode::start_etcd() {
     -v /var/lib/swarm/etcd:/var/etcd \
     gcr.io/google_containers/etcd-${ARCH}:${ETCD_VERSION} \
     /usr/local/bin/etcd \
-      --listen-client-urls=http://0.0.0.0:2379,http://0.0.0.0:4001 \
-      --advertise-client-urls=http://localhost:2379,http://localhost:4001 \
+      --listen-client-urls=http://${MASTER_IP}:2379,http://localhost:2379 \
+      --advertise-client-urls=http://${MASTR_IP}:2379 \
       --listen-peer-urls=http://0.0.0.0:2380 \
       --data-dir=/var/etcd/data
 

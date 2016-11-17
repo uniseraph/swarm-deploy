@@ -65,7 +65,7 @@ swarm::bootstrap::restart_docker
 
 #swarm::multinode::start_k8s_master
 
-swarm::multinode::start_swarm_agent ${ZK_URL}
+swarm::multinode::start_swarm_agent ${ETCD_URL}
 
 
 if [ ! -d "/etc/swarm/aliyuncli" ]; then
