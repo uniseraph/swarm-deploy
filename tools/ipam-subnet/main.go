@@ -37,7 +37,7 @@ func init() {
 	flag.StringVar(&opts.etcdCAFile, "etcd-cafile", "", "SSL Certificate Authority file used to secure etcd communication")
 	flag.StringVar(&opts.etcdUsername, "etcd-username", "", "Username for BasicAuth to etcd")
 	flag.StringVar(&opts.etcdPassword, "etcd-password", "", "Password for BasicAuth to etcd")
-	flag.StringVar(&opts.localIP,"local-ip ","192.168.3.19","Local IP used to connect etcd")
+	flag.StringVar(&opts.localIP,"local-ip","192.168.3.19","Local IP used to connect etcd")
 	flag.BoolVar(&opts.kubeSubnetMgr, "kube-subnet-mgr", false, "Contact the Kubernetes API for subnet assignement instead of etcd or flannel-server.")
 	flag.BoolVar(&opts.help, "help", false, "print this message")
 	flag.BoolVar(&opts.version, "version", false, "print version and exit")
@@ -98,6 +98,8 @@ func main() {
 		os.Exit(1)
 	}
 
+
+	fmt.Print(l.Subnet.String()+" ")
 	l.Subnet.IP = l.Subnet.IP + 1
 	fmt.Print(l.Subnet.String())
 }

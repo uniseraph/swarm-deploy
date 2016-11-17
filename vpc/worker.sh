@@ -40,15 +40,20 @@ swarm::multinode::turndown
 
 swarm::bootstrap::bootstrap_daemon
 
-BIP=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
+
+LOCAL_IP=$(ifconfig eth0  | grep inet | awk '{{print $2}}' )
+LINE=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti  --rm \
       --net=host \
       ${IPAM_SUBNET_IMG} \
       ipam-subnet   \
       --etcd-endpoints=http://${MASTER_IP}:2379 \
-      --etcd-prefix=/coreos.com/network  |
-      tail -n1 |
-      tr -d '\r')
-#swarm::multinode::start_flannel
+      --etcd-prefix=/coreos.com/network \
+      --local-ip=${LOCAL_IP} |
+      tail -n1 | tr -d '\r')
+
+echo "LINE=${LINE}"
+SUBNET=$(echo ${LINE} | awk '{{print $1}}')
+BIP=$(echo ${LINE} | awk '{{print $2}}'  )
 
 swarm::bootstrap::restart_docker
 
@@ -56,3 +61,23 @@ swarm::bootstrap::restart_docker
 
 swarm::multinode::start_swarm_agent
 
+
+if [ ! -d "/etc/swarm/aliyuncli" ]; then
+  # Control will enter here if $DIRECTORY doesn't exist.
+
+  ALIYUNCLI_CONFIG=$(curl -sSL http://${MASTER_IP}:2379/v2/keys/cores.com/aliyuncli/config   | jq .node.value   |  sed -e 's/^.//' | sed -e 's/.$//' | tr -d "\\")
+  echo "${ALIYUNCLI_CONFIG}" > /tmp/aliyuncli_config
+  AccessKey=$(cat /tmp/aliyuncli_config | jq .AccessKey | tr -d '"' )
+  AccessSecret=$( echo ${ALIYUNCLI_CONFIG} | jq  .AccessSecret | tr -d '"')
+  Region=$( echo ${ALIYUNCLI_CONFIG} | jq .Region | tr -d '"')
+  Output=$( echo ${ALIYUNCLI_CONFIG} | jq .Output | tr -d '"')
+  
+  docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
+    uniseraph/aliyuncli aliyuncli configure set \
+    --output ${Output} \
+    --region ${Region} \
+    --aliyun_access_key_secret ${AccessSecret} \
+    --aliyun_access_key_id ${AccessKey}
+fi
+
+swarm::vpc::create_vroute_entry

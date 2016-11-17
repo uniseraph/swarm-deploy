@@ -57,7 +57,7 @@ swarm::multinode::main(){
   #FLANNEL_NETWORK=${FLANNEL_NETWORK:-"10.1.0.0/16"}
 
   #BIP=${SUBNET:-"192.168.1.1/24"}
-  #swarm::log::status "BIP is set to: ${BIP}"
+  swarm::log::status "SUBNET is set to: ${SUBNET}"
 
   MTU=${MTU:-"1472"}
   swarm::log::status "MTU is set to: ${MTU}"
@@ -266,6 +266,33 @@ swarm::multinode::make_shared_swarmlet_dir() {
     swarm::log::status "Mounted /var/lib/swarmlet with shared propagnation"
   fi
 }
+
+swarm::vpc::create_vroute_entry(){
+   VpcId=$(curl 100.100.100.200/latest/meta-data/vpc-id)
+   InstanceId=$(curl 100.100.100.200/latest/meta-data/instance-id)
+
+   swarm::log::status "VpcId is ${VpcId} ... "
+   swarm::log::status "InstanceId is ${InstanceId} ... "
+
+   VRouterId=$( docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
+     uniseraph/aliyuncli aliyuncli ecs DescribeVpcs \
+     --VpcId=${Vpd_Id} | jq .Vpcs[][].VRouterId )
+
+   swarm::log::status "VRouterId is ${VRouterId} ... "
+   RouteTableId=$(docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
+     uniseraph/aliyuncli aliyuncli ecs DescribeVRouters \
+     --VRouterId=vrt-j6cik70l058ax7co687a6 | \
+     jq .VRouters[][].RouteTableIds.RouteTableId[] | \
+     tr -d '\"')
+
+   swarm::log::status "RouteTableId is ${RouteTableId} ... "
+   docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
+     uniseraph/aliyuncli aliyuncli ecs CreateRouteEntry \
+      --DestinationCidrBlock ${SUBNET} \
+      --NextHopId ${InstanceId} \
+      --RouteTableId ${RouteTableId}
+}
+
 
 swarm::multinode::create_swarmconfig(){
   # Create a swarmconfig.yaml file for the proxy daemonset
