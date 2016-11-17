@@ -23,11 +23,6 @@ ZK_URL="zk://${MASTER_IP}:2181"
 NETWORK=${NETWORK:-192.168.0.0/16}
 #IPAM_SUBNET_IMG=${IPAM_SUBNET_IMG:-uniseraph/ipam-subnet:0.1}
 
-if [ ! -d "/etc/swarm/aliyuncli" ]; then
-  # Control will enter here if $DIRECTORY doesn't exist.
-  docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
-    uniseraph/aliyuncli aliyuncli configure
-fi
 
 swarm::multinode::main
 
@@ -35,6 +30,11 @@ swarm::multinode::turndown
 
 swarm::bootstrap::bootstrap_daemon
 
+if [ ! -d "/etc/swarm/aliyuncli" ]; then
+  # Control will enter here if $DIRECTORY doesn't exist.
+  docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
+    uniseraph/aliyuncli aliyuncli configure
+fi
 swarm::multinode::start_etcd
 #swarm::multinode::start_zookeeper
 
