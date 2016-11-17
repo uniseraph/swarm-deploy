@@ -28,7 +28,7 @@ if [[ -z ${ECTD_URL} ]]; then
     ETCD_URL=etcd://${MASTER_IP}:2379
 fi
 if [[ -z ${ZK_URL} ]]; then
-    ETCD_URL=zk://${MASTER_IP}:2181
+    ZK_URL=zk://${MASTER_IP}:2181
 fi
 
 #if [[ -z ${BIP} ]]; then
