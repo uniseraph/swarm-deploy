@@ -33,7 +33,7 @@ swarm::bootstrap::bootstrap_daemon
 if [ ! -d "/etc/swarm/aliyuncli" ]; then
   # Control will enter here if $DIRECTORY doesn't exist.
   docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
-    uniseraph/aliyuncli aliyuncli configure
+    ${ALIYUNCLI_IMG} aliyuncli configure
 fi
 swarm::multinode::start_etcd
 #swarm::multinode::start_zookeeper
@@ -41,33 +41,33 @@ swarm::multinode::start_etcd
 curl -sSL http://${MASTER_IP}:2379/v2/keys/coreos.com/network/config -XPUT \
       -d value="{ \"Network\": \"${NETWORK}\", \"Backend\": {\"Type\": \"vxlan\"}}"
 
+swarm::common:register_aliyuncli_config
+#AccessKey=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run  -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+#  uniseraph/aliyuncli \
+#  aliyuncli configure get aliyun_access_key_id | \
+#  awk '{{print $3}}' |
+#  tr -d '\r')
 
-AccessKey=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run  -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
-  uniseraph/aliyuncli \
-  aliyuncli configure get aliyun_access_key_id | \
-  awk '{{print $3}}' |
-  tr -d '\r')
+#AccessSecret=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+#  uniseraph/aliyuncli \
+#  aliyuncli configure get aliyun_access_key_secret | \
+#  awk '{{print $3}}' |
+#  tr -d '\r')
 
-AccessSecret=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
-  uniseraph/aliyuncli \
-  aliyuncli configure get aliyun_access_key_secret | \
-  awk '{{print $3}}' |
-  tr -d '\r')
+#Region=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+#  uniseraph/aliyuncli \
+#  aliyuncli configure get region | \
+#  awk '{{print $3}}' |
+#  tr -d '\r')
 
-Region=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
-  uniseraph/aliyuncli \
-  aliyuncli configure get region | \
-  awk '{{print $3}}' |
-  tr -d '\r')
+#Output=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+#  uniseraph/aliyuncli \
+#  aliyuncli configure get output | \
+#  awk '{{print $3}}' |
+#  tr -d '\r' )
 
-Output=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
-  uniseraph/aliyuncli \
-  aliyuncli configure get output | \
-  awk '{{print $3}}' |
-  tr -d '\r' )
-
-curl -sSL http://${MASTER_IP}:2379/v2/keys/cores.com/aliyuncli/config -XPUT \
-      -d value="{ \"AccessKey\": \"${AccessKey}\" , \"AccessSecret\" : \"${AccessSecret}\" , \"Region\":\"${Region}\" ,  \"Output\":\"${Output}\" }"
+#curl -sSL http://${MASTER_IP}:2379/v2/keys/cores.com/aliyuncli/config -XPUT \
+#      -d value="{ \"AccessKey\": \"${AccessKey}\" , \"AccessSecret\" : \"${AccessSecret}\" , \"Region\":\"${Region}\" ,  \"Output\":\"${Output}\" }"
 
 
 

@@ -49,6 +49,7 @@ swarm::multinode::main(){
   ZK_VERSION=${ZK_VERSION:-3.4.9}
   swarm::log::status "ZK_VERSION is set to: ${ZK_VERSION}"
 
+  ALIYUNCLI_IMG=${ALIYUNCLI_IMG:-"${ALIYUNCLI_IMG}"}
   #swarm::log::status "ZK_URL  is set to: ${ZK_URL}"
 
   #FLANNEL_VERSION=${FLANNEL_VERSION:-"v0.6.1"}
@@ -281,19 +282,19 @@ swarm::vpc::create_vroute_entry(){
    swarm::log::status "InstanceId is ${InstanceId} ... "
 
    VRouterId=$( docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
-     uniseraph/aliyuncli aliyuncli ecs DescribeVpcs \
+     ${ALIYUNCLI_IMG} aliyuncli ecs DescribeVpcs \
      --VpcId=${Vpd_Id} | jq .Vpcs[][].VRouterId )
 
    swarm::log::status "VRouterId is ${VRouterId} ... "
    RouteTableId=$(docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
-     uniseraph/aliyuncli aliyuncli ecs DescribeVRouters \
+     ${ALIYUNCLI_IMG} aliyuncli ecs DescribeVRouters \
      --VRouterId=vrt-j6cik70l058ax7co687a6 | \
      jq .VRouters[][].RouteTableIds.RouteTableId[] | \
      tr -d '\"')
 
    swarm::log::status "RouteTableId is ${RouteTableId} ... "
    docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
-     uniseraph/aliyuncli aliyuncli ecs CreateRouteEntry \
+     ${ALIYUNCLI_IMG} aliyuncli ecs CreateRouteEntry \
       --DestinationCidrBlock ${SUBNET} \
       --NextHopId ${InstanceId} \
       --RouteTableId ${RouteTableId}
@@ -409,3 +410,42 @@ swarm::common::get_subnet_bip(){
   swarm::log::status "SUBNET=${SUBNET}"
   swarm::log::status "BIP=${BIP}"
 }
+
+
+swarm::common::register_aliyuncli_config(){
+
+
+  #    curl -sSL http://${MASTER_IP}:2379/v2/keys/coreos.com/network/config -XPUT \
+   #         -d value="{ \"Network\": \"${NETWORK}\", \"Backend\": {\"Type\": \"vxlan\"}}"
+
+
+AccessKey=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run  -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+  ${ALIYUNCLI_IMG} \
+  aliyuncli configure get aliyun_access_key_id | \
+  awk '{{print $3}}' |
+  tr -d '\r')
+
+AccessSecret=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+  ${ALIYUNCLI_IMG} \
+  aliyuncli configure get aliyun_access_key_secret | \
+  awk '{{print $3}}' |
+  tr -d '\r')
+
+Region=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+  ${ALIYUNCLI_IMG} \
+  aliyuncli configure get region | \
+  awk '{{print $3}}' |
+  tr -d '\r')
+
+Output=$(docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli  \
+  ${ALIYUNCLI_IMG} \
+  aliyuncli configure get output | \
+  awk '{{print $3}}' |
+  tr -d '\r' )
+
+curl -sSL http://${MASTER_IP}:2379/v2/keys/cores.com/aliyuncli/config -XPUT \
+      -d value="{ \"AccessKey\": \"${AccessKey}\" , \"AccessSecret\" : \"${AccessSecret}\" , \"Region\":\"${Region}\" ,  \"Output\":\"${Output}\" }"
+}
+
+
+

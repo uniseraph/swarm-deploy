@@ -79,7 +79,7 @@ if [ ! -d "/etc/swarm/aliyuncli" ]; then
   Output=$( echo ${ALIYUNCLI_CONFIG} | jq .Output | tr -d '"')
   
   docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
-    uniseraph/aliyuncli aliyuncli configure set \
+    ${ALIYUNCLI_IMG} aliyuncli configure set \
     --output ${Output} \
     --region ${Region} \
     --aliyun_access_key_secret ${AccessSecret} \
