@@ -50,22 +50,12 @@ swarm::multinode::main(){
   swarm::log::status "ZK_VERSION is set to: ${ZK_VERSION}"
 
   ALIYUNCLI_IMG=${ALIYUNCLI_IMG:-"uniseraph/aliyuncli"}
-  #swarm::log::status "ZK_URL  is set to: ${ZK_URL}"
 
-  #FLANNEL_VERSION=${FLANNEL_VERSION:-"v0.6.1"}
-  #FLANNEL_IPMASQ=${FLANNEL_IPMASQ:-"true"}
-  #FLANNEL_BACKEND=${FLANNEL_BACKEND:-"udp"}
-  #FLANNEL_NETWORK=${FLANNEL_NETWORK:-"10.1.0.0/16"}
-
-  #BIP=${SUBNET:-"192.168.1.1/24"}
-  #swarm::log::status "SUBNET is set to: ${SUBNET}"
 
   MTU=${MTU:-"1472"}
   swarm::log::status "MTU is set to: ${MTU}"
 
-  # RESTART_POLICY=${RESTART_POLICY:-"unless-stopped"}
 
-#  DEFAULT_IP_ADDRESS=$(ip -o -4 addr list $(ip -o -4 route show to default | awk '{print $5}' | head -1) | awk '{print $4}' | cut -d/ -f1 | head -1)
   DEFAULT_IP_ADDRESS=$( ifconfig eth0 | grep inet | awk '{{print $2}}' )
   IP_ADDRESS=${IP_ADDRESS:-${DEFAULT_IP_ADDRESS}}
   swarm::log::status "IP_ADDRESS is set to: ${IP_ADDRESS}"
@@ -83,7 +73,6 @@ swarm::multinode::start_zookeeper() {
 
   swarm::log::status "Launching zookeeper..."
 
-  # TODO: Remove the 4001 port as it is deprecated
   docker ${BOOTSTRAP_DOCKER_PARAM} run -d \
     --name swarm_zk_$(swarm::helpers::small_sha) \
     --restart=always \
@@ -172,63 +161,6 @@ swarm::multinode::start_flannel() {
   swarm::log::status "FLANNEL_MTU is set to: ${FLANNEL_MTU}"
 }
 
-#swarm::multinode::start_swarm_agent() {
-#  swarm::log::status "Launching swarm agent ..."
-
-#  DIS_URL=$1
-#  DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
-#  SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
-
-
-#  docker run -d \
-#    --net=host \
-#    --pid=host \
-#    --restart=always \
-#    swarm:${SWARM_VERSION} \
-#    join \
-#    --addr   ${DOCKER_LISTEN_URL} \
-#    ${DIS_URL}
-#
-#}
-# Start swarmlet first and then the master components as pods
-#swarm::multinode::start_swarm_master() {
-
-#  DIS_URL=$1
-
-
-#  DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
-#  SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
-#
-#  swarm::log::status "Launching swarm master at ${SWARM_LISTEN_URL} ..."
-#  docker run -d \
-#    --net=host \
-#    --pid=host \
-#    --restart=always \
-#    swarm:${SWARM_VERSION} \
-#    join \
-#    --addr   ${DOCKER_LISTEN_URL}\
-#    ${DIS_URL}
-    #    ${ETCD_URL}
-
-#  sleep 2
-
-#  docker run -d \
-#    --net=host \
-#    --pid=host \
-#    --restart=always \
-#    swarm:${SWARM_VERSION} \
-#    manage \
-#    --host=${SWARM_LISTEN_URL} \
-#    ${DIS_URL}
-#    #${ETCD_URL}
-#}
-
-
-
-
-
-
-
 
 # Turndown the local cluster
 swarm::multinode::turndown(){
@@ -260,55 +192,6 @@ swarm::multinode::delete_bridge() {
   fi
 }
 
-# Make shared swarmlet directory
-swarm::multinode::make_shared_swarmlet_dir() {
-
-  # This only has to be done when the host doesn't use systemd
-  if ! swarm::helpers::command_exists systemctl; then
-    mkdir -p /var/lib/swarmlet
-    mount --bind /var/lib/swarmlet /var/lib/swarmlet
-    mount --make-shared /var/lib/swarmlet
-
-    swarm::log::status "Mounted /var/lib/swarmlet with shared propagnation"
-  fi
-}
-
-#swarm::vpc::create_vroute_entry(){
-#   swarm::log::status "Add custom route ..."
-#   VpcId=$(curl 100.100.100.200/latest/meta-data/vpc-id)
-#   InstanceId=$(curl 100.100.100.200/latest/meta-data/instance-id)
-
-#   swarm::log::status "VpcId is ${VpcId} ... "
-#   swarm::log::status "InstanceId is ${InstanceId} ... "
-
-#   VRouterId=$( docker ${BOOTSTRAP_DOCKER_PARAM} run \
-#     --net=host -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
-#     ${ALIYUNCLI_IMG} aliyuncli ecs DescribeVpcs \
-#     --VpcId ${VpcId} | jq .Vpcs[][].VRouterId | \
-#     tr -d '\"' )
-
-#   swarm::log::status "VRouterId is ${VRouterId} ... "
-#   RouteTableId=$(docker ${BOOTSTRAP_DOCKER_PARAM} run \
-#     --net=host -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
-#     ${ALIYUNCLI_IMG} aliyuncli ecs DescribeVRouters \
-#     --VRouterId ${VRouterId} | \
-#     jq .VRouters[][].RouteTableIds.RouteTableId[] | \
-#     tr -d '\"')
-
-#   swarm::log::status "RouteTableId is ${RouteTableId} ... "
-#   docker ${BOOTSTRAP_DOCKER_PARAM}  run --net=host -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
-#     ${ALIYUNCLI_IMG} aliyuncli ecs CreateRouteEntry \
-#      --DestinationCidrBlock ${SUBNET} \
-#      --NextHopId ${InstanceId} \
-#      --RouteTableId ${RouteTableId}
-#}
-
-
-swarm::multinode::create_swarmconfig(){
-  # Create a swarmconfig.yaml file for the proxy daemonset
-  mkdir -p /var/lib/swarmlet/swarmconfig
-  sed -e "s|MASTER_IP|${MASTER_IP}|g" swarmconfig.yaml > /var/lib/swarmlet/swarmconfig/swarmconfig.yaml
-}
 
 # Check if a command is valid
 swarm::helpers::command_exists() {
