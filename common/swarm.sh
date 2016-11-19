@@ -15,7 +15,7 @@ swarm::start_agent() {
     --net=host \
     --pid=host \
     --restart=always \
-    ${SWARM_IMG_VERSION} \
+    ${SWARM_IMG} \
     join \
     --addr   ${DOCKER_LISTEN_URL} \
     ${DIS_URL}
@@ -35,7 +35,7 @@ swarm::start_master() {
     --net=host \
     --pid=host \
     --restart=always \
-    ${SWARM_IMG_VERSION} \
+    ${SWARM_IMG} \
     join \
     --addr   ${DOCKER_LISTEN_URL}\
     ${DIS_URL}
