@@ -6,7 +6,6 @@ swarm::start_agent() {
   swarm::log::status "Launching swarm agent ..."
 
   DIS_URL=$1
-  SWARM_IMG=$2
   DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
   SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
 
@@ -25,7 +24,6 @@ swarm::start_agent() {
 swarm::start_master() {
 
   DIS_URL=$1
-  SWARM_IMG=$2
 
   DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
   SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
