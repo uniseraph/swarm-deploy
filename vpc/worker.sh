@@ -16,7 +16,7 @@
 
 # Source common.sh
 source $(dirname "${BASH_SOURCE}")/common.sh
-
+source $(dirname "${BASH_SOURCE}")/../aliyun.sh
 
 if [[ -z ${MASTER_IP} ]]; then
     echo "Please export MASTER_IP in your env"
@@ -64,4 +64,4 @@ if [ ! -d "/etc/swarm/aliyuncli" ]; then
     --aliyun_access_key_id ${AccessKey}
 fi
 
-swarm::vpc::create_vroute_entry
+aliyun::vpc::create_vroute_entry

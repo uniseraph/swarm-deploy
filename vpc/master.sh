@@ -16,7 +16,7 @@
 
 # Source common.sh
 source $(dirname "${BASH_SOURCE}")/common.sh
-
+source $(dirname "${BASH_SOURCE}")/../aliyun.sh
 MASTER_IP=$(ifconfig eth0 | grep inet | awk '{{print $2}}')
 ETCD_URL="etcd://${MASTER_IP}:2379"
 ZK_URL="zk://${MASTER_IP}:2181"
@@ -51,5 +51,5 @@ swarm::bootstrap::restart_docker
 swarm::multinode::start_swarm_master ${ETCD_URL}
 
 
-swarm::vpc::create_vroute_entry
+aliyun::vpc::create_vroute_entry
 
