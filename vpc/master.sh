@@ -16,6 +16,9 @@
 
 # Source common.sh
 source $(dirname "${BASH_SOURCE}")/common.sh
+source $(dirname "${BASH_SOURCE}")/../common/aliyun.sh
+source $(dirname "${BASH_SOURCE}")/../common/swarm.sh
+
 
 MASTER_IP=$(ifconfig eth0 | grep inet | awk '{{print $2}}')
 ETCD_URL="etcd://${MASTER_IP}:2379"
@@ -48,8 +51,8 @@ swarm::common::get_subnet_bip ${MASTER_IP} ${MASTER_IP}
 swarm::bootstrap::restart_docker
 
 
-swarm::multinode::start_swarm_master ${ETCD_URL}
+swarm::start_master ${ETCD_URL}
 
 
-swarm::vpc::create_vroute_entry
+aliyun::vpc::create_vroute_entry
 
