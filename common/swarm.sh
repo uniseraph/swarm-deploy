@@ -45,7 +45,7 @@ swarm::start_master() {
     --net=host \
     --pid=host \
     --restart=always \
-    swarm:${SWARM_VERSION} \
+    ${SWARM_IMG} \
     manage \
     --host=${SWARM_LISTEN_URL} \
     ${DIS_URL}
