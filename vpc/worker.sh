@@ -16,7 +16,7 @@
 
 # Source common.sh
 source $(dirname "${BASH_SOURCE}")/common.sh
-source $(dirname "${BASH_SOURCE}")/../aliyun.sh
+source $(dirname "${BASH_SOURCE}")/../common/aliyun.sh
 
 if [[ -z ${MASTER_IP} ]]; then
     echo "Please export MASTER_IP in your env"
