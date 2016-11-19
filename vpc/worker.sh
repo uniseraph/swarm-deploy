@@ -17,6 +17,7 @@
 # Source common.sh
 source $(dirname "${BASH_SOURCE}")/common.sh
 source $(dirname "${BASH_SOURCE}")/../common/aliyun.sh
+source $(dirname "${BASH_SOURCE}")/../common/swarm.sh
 
 if [[ -z ${MASTER_IP} ]]; then
     echo "Please export MASTER_IP in your env"
@@ -43,7 +44,7 @@ swarm::common::get_subnet_bip ${MASTER_IP} ${LOCAL_IP}
 
 swarm::bootstrap::restart_docker
 
-swarm::multinode::start_swarm_agent ${ETCD_URL}
+swarm::start_agent ${ETCD_URL}
 
 
 if [ ! -d "/etc/swarm/aliyuncli" ]; then

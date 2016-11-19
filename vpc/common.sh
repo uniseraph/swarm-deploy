@@ -24,7 +24,7 @@ swarm::multinode::main(){
     swarm::log::fatal "Please run as root"
   fi
 
-  for tool in curl ip docker; do
+  for tool in curl ip docker jq ; do
     if [[ ! -f $(which ${tool} 2>&1) ]]; then
       swarm::log::status "The binary ${tool} is required. Install it..."
       yum install -y ${tool}
@@ -42,8 +42,8 @@ swarm::multinode::main(){
   ARCH=${ARCH:-${CURRENT_PLATFORM##*/}}
   swarm::log::status "ARCH is set to: ${ARCH}"
 
-  SWARM_VERSION=${SWARM_VERSION:-1.2.5}
-  swarm::log::status "SWARM_VERSION is set to: ${SWARM_VERSION}"
+  SWARM_IMG=${SWARM_IMG:-"swarm:1.2.5"}
+  swarm::log::status "SWARM_IMG is set to: ${SWARM_IMG}"
   ETCD_VERSION=${ETCD_VERSION:-"3.0.4"}
   swarm::log::status "ETCD_VERSION is set to: ${ETCD_VERSION}"
   ZK_VERSION=${ZK_VERSION:-3.4.9}
@@ -172,56 +172,56 @@ swarm::multinode::start_flannel() {
   swarm::log::status "FLANNEL_MTU is set to: ${FLANNEL_MTU}"
 }
 
-swarm::multinode::start_swarm_agent() {
-  swarm::log::status "Launching swarm agent ..."
+#swarm::multinode::start_swarm_agent() {
+#  swarm::log::status "Launching swarm agent ..."
 
-  DIS_URL=$1
-  DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
-  SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
+#  DIS_URL=$1
+#  DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
+#  SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
 
 
-  docker run -d \
-    --net=host \
-    --pid=host \
-    --restart=always \
-    swarm:${SWARM_VERSION} \
-    join \
-    --addr   ${DOCKER_LISTEN_URL} \
-    ${DIS_URL}
-
-}
+#  docker run -d \
+#    --net=host \
+#    --pid=host \
+#    --restart=always \
+#    swarm:${SWARM_VERSION} \
+#    join \
+#    --addr   ${DOCKER_LISTEN_URL} \
+#    ${DIS_URL}
+#
+#}
 # Start swarmlet first and then the master components as pods
-swarm::multinode::start_swarm_master() {
+#swarm::multinode::start_swarm_master() {
 
-  DIS_URL=$1
+#  DIS_URL=$1
 
 
-  DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
-  SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
-
-  swarm::log::status "Launching swarm master at ${SWARM_LISTEN_URL} ..."
-  docker run -d \
-    --net=host \
-    --pid=host \
-    --restart=always \
-    swarm:${SWARM_VERSION} \
-    join \
-    --addr   ${DOCKER_LISTEN_URL}\
-    ${DIS_URL}
+#  DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
+#  SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
+#
+#  swarm::log::status "Launching swarm master at ${SWARM_LISTEN_URL} ..."
+#  docker run -d \
+#    --net=host \
+#    --pid=host \
+#    --restart=always \
+#    swarm:${SWARM_VERSION} \
+#    join \
+#    --addr   ${DOCKER_LISTEN_URL}\
+#    ${DIS_URL}
     #    ${ETCD_URL}
 
-  sleep 2
+#  sleep 2
 
-  docker run -d \
-    --net=host \
-    --pid=host \
-    --restart=always \
-    swarm:${SWARM_VERSION} \
-    manage \
-    --host=${SWARM_LISTEN_URL} \
-    ${DIS_URL}
-    #${ETCD_URL}
-}
+#  docker run -d \
+#    --net=host \
+#    --pid=host \
+#    --restart=always \
+#    swarm:${SWARM_VERSION} \
+#    manage \
+#    --host=${SWARM_LISTEN_URL} \
+#    ${DIS_URL}
+#    #${ETCD_URL}
+#}
 
 
 
