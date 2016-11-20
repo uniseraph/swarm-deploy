@@ -38,7 +38,7 @@ fi
 
 common::setup_var
 
-swarm::multinode::turndown
+common::turndown
 
 docker::bootstrap_daemon
 

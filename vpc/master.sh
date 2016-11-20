@@ -31,7 +31,7 @@ NETWORK=${NETWORK:-192.168.0.0/16}
 
 common::setup_var
 
-swarm::multinode::turndown
+common::turndown
 
 docker::bootstrap_daemon
 
