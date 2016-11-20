@@ -15,6 +15,7 @@
 # limitations under the License.
 
 # Source common.sh
+source $(dirname "${BASH_SOURCE}")/../common/utils.sh
 source $(dirname "${BASH_SOURCE}")/common.sh
 source $(dirname "${BASH_SOURCE}")/../common/aliyun.sh
 source $(dirname "${BASH_SOURCE}")/../common/swarm.sh

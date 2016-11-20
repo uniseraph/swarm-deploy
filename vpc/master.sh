@@ -15,6 +15,8 @@
 # limitations under the License.
 
 # Source common.sh
+
+source $(dirname "${BASH_SOURCE}")/../common/utils.sh
 source $(dirname "${BASH_SOURCE}")/common.sh
 source $(dirname "${BASH_SOURCE}")/../common/aliyun.sh
 source $(dirname "${BASH_SOURCE}")/../common/swarm.sh
@@ -35,7 +37,7 @@ swarm::bootstrap::bootstrap_daemon
 swarm::multinode::start_etcd
 if [ ! -d "/etc/swarm/aliyuncli" ]; then
   # Control will enter here if $DIRECTORY doesn't exist.
-  swarm::log::status "init and register aliyunconfig at etcd..."
+  utils::log::status "init and register aliyunconfig at etcd..."
   docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
     ${ALIYUNCLI_IMG} aliyuncli configure
   swarm::common::register_aliyuncli_config
