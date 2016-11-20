@@ -16,7 +16,8 @@
 
 # Source common.sh
 source $(dirname "${BASH_SOURCE}")/../common/utils.sh
-source $(dirname "${BASH_SOURCE}")/common.sh
+source $(dirname "${BASH_SOURCE}")/../common/docker.sh
+source $(dirname "${BASH_SOURCE}")/../common/common.sh
 source $(dirname "${BASH_SOURCE}")/../common/aliyun.sh
 source $(dirname "${BASH_SOURCE}")/../common/swarm.sh
 
@@ -33,17 +34,17 @@ if [[ -z ${ZK_URL} ]]; then
     ZK_URL=zk://${MASTER_IP}:2181
 fi
 
-LOCAL_IP=$(ifconfig eth0  | grep inet | awk '{{print $2}}' )
+#LOCAL_IP=$(ifconfig eth0  | grep inet | awk '{{print $2}}' )
 
-swarm::multinode::main
+common::setup_var
 
 swarm::multinode::turndown
 
-swarm::bootstrap::bootstrap_daemon
+docker::bootstrap_daemon
 
-swarm::common::get_subnet_bip ${MASTER_IP} ${LOCAL_IP}
+common::get_subnet_bip ${MASTER_IP} ${IP_ADDRESS}
 
-swarm::bootstrap::restart_docker
+docker::restart_docker
 
 swarm::start_agent ${ETCD_URL}
 

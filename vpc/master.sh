@@ -17,7 +17,8 @@
 # Source common.sh
 
 source $(dirname "${BASH_SOURCE}")/../common/utils.sh
-source $(dirname "${BASH_SOURCE}")/common.sh
+source $(dirname "${BASH_SOURCE}")/../common/docker.sh
+source $(dirname "${BASH_SOURCE}")/../common/common.sh
 source $(dirname "${BASH_SOURCE}")/../common/aliyun.sh
 source $(dirname "${BASH_SOURCE}")/../common/swarm.sh
 
@@ -28,29 +29,29 @@ ZK_URL="zk://${MASTER_IP}:2181"
 NETWORK=${NETWORK:-192.168.0.0/16}
 
 
-swarm::multinode::main
+common::setup_var
 
 swarm::multinode::turndown
 
-swarm::bootstrap::bootstrap_daemon
+docker::bootstrap_daemon
 
-swarm::multinode::start_etcd
+common::start_etcd
 if [ ! -d "/etc/swarm/aliyuncli" ]; then
   # Control will enter here if $DIRECTORY doesn't exist.
   utils::log::status "init and register aliyunconfig at etcd..."
   docker -H ${BOOTSTRAP_DOCKER_SOCK} run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
     ${ALIYUNCLI_IMG} aliyuncli configure
-  swarm::common::register_aliyuncli_config
+  common::register_aliyuncli_config
 fi
 
 curl -sSL http://${MASTER_IP}:2379/v2/keys/coreos.com/network/config -XPUT \
       -d value="{ \"Network\": \"${NETWORK}\", \"Backend\": {\"Type\": \"vxlan\"}}"
 
-swarm::common::get_subnet_bip ${MASTER_IP} ${MASTER_IP}
+common::get_subnet_bip ${MASTER_IP} ${MASTER_IP}
 
 
 
-swarm::bootstrap::restart_docker
+docker::restart_docker
 
 
 swarm::start_master ${ETCD_URL}
