@@ -53,3 +53,29 @@ swarm::start_master() {
     ${DIS_URL}
     #${ETCD_URL}
 }
+
+
+
+shipyard::start_shipyard() {
+     docker run \
+    -ti \
+    -d \
+    --restart=always \
+    --name shipyard-rethinkdb \
+    rethinkdb
+
+
+ SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
+
+
+ docker run \
+    -ti \
+    -d \
+    --restart=always \
+    --name shipyard-controller \
+    --link shipyard-rethinkdb:rethinkdb \
+    -p 8080:8080 \
+    shipyard/shipyard:latest \
+    server \
+    -d tcp://${SWARM_LISTEN_URL}
+}
