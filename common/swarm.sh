@@ -56,7 +56,7 @@ swarm::start_master() {
 
 
 
-shipyard::start_shipyard() {
+swarm::start_shipyard() {
      docker run \
     -ti \
     -d \
