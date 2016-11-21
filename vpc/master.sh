@@ -56,6 +56,6 @@ docker::restart_docker
 
 swarm::start_master ${ETCD_URL}
 
-
+swarm::start_shipyard 
 aliyun::vpc::create_vroute_entry
 
