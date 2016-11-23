@@ -1,9 +1,11 @@
 #!/bin/bash
 
+#source ./utils.sh
+
 
 
 swarm::start_agent() {
-  swarm::log::status "Launching swarm agent ..."
+  utils::log::status "Launching swarm agent ..."
 
   DIS_URL=$1
   DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
@@ -28,7 +30,7 @@ swarm::start_master() {
   DOCKER_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
   SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
 
-  swarm::log::status "Launching swarm master at ${SWARM_LISTEN_URL} ..."
+  utils::log::status "Launching swarm master at ${SWARM_LISTEN_URL} ..."
   docker run -d \
     --net=host \
     --pid=host \
@@ -50,4 +52,30 @@ swarm::start_master() {
     --host=${SWARM_LISTEN_URL} \
     ${DIS_URL}
     #${ETCD_URL}
+}
+
+
+
+swarm::start_shipyard() {
+     docker run \
+    -ti \
+    -d \
+    --restart=always \
+    --name shipyard-rethinkdb \
+    rethinkdb
+
+
+ SWARM_LISTEN_URL=$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2375
+
+
+ docker run \
+    -ti \
+    -d \
+    --restart=always \
+    --name shipyard-controller \
+    --link shipyard-rethinkdb:rethinkdb \
+    -p 8080:8080 \
+    shipyard/shipyard:latest \
+    server \
+    -d tcp://${SWARM_LISTEN_URL}
 }

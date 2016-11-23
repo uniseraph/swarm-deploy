@@ -1,11 +1,14 @@
 #!/bin/bash
+
+#source ./utils.sh
+
 aliyun::vpc::create_vroute_entry(){
-   swarm::log::status "Add custom route ..."
+   utils::log::status "Add custom route ..."
    VpcId=$(curl 100.100.100.200/latest/meta-data/vpc-id)
    InstanceId=$(curl 100.100.100.200/latest/meta-data/instance-id)
 
-   swarm::log::status "VpcId is ${VpcId} ... "
-   swarm::log::status "InstanceId is ${InstanceId} ... "
+   utils::log::status "VpcId is ${VpcId} ... "
+   utils::log::status "InstanceId is ${InstanceId} ... "
 
    VRouterId=$( docker ${BOOTSTRAP_DOCKER_PARAM} run \
      --net=host -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
@@ -13,7 +16,7 @@ aliyun::vpc::create_vroute_entry(){
      --VpcId ${VpcId} | jq .Vpcs[][].VRouterId | \
      tr -d '\"' )
 
-   swarm::log::status "VRouterId is ${VRouterId} ... "
+   utils::log::status "VRouterId is ${VRouterId} ... "
    RouteTableId=$(docker ${BOOTSTRAP_DOCKER_PARAM} run \
      --net=host -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
      ${ALIYUNCLI_IMG} aliyuncli ecs DescribeVRouters \
@@ -21,7 +24,7 @@ aliyun::vpc::create_vroute_entry(){
      jq .VRouters[][].RouteTableIds.RouteTableId[] | \
      tr -d '\"')
 
-   swarm::log::status "RouteTableId is ${RouteTableId} ... "
+   utils::log::status "RouteTableId is ${RouteTableId} ... "
    docker ${BOOTSTRAP_DOCKER_PARAM}  run --net=host -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
      ${ALIYUNCLI_IMG} aliyuncli ecs CreateRouteEntry \
       --DestinationCidrBlock ${SUBNET} \

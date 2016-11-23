@@ -17,9 +17,9 @@
 # Utility functions for Kubernetes in docker setup and bootstrap mode
 
 # Start a docker bootstrap for running etcd and flannel
-swarm::bootstrap::bootstrap_daemon() {
+docker::bootstrap_daemon() {
 
-  swarm::log::status "Launching docker bootstrap..."
+  utils::log::status "Launching docker bootstrap..."
 
 
   modprobe overlay
@@ -41,56 +41,56 @@ swarm::bootstrap::bootstrap_daemon() {
   while [[ $(docker -H ${BOOTSTRAP_DOCKER_SOCK} ps 2>&1 1>/dev/null; echo $?) != 0 ]]; do
     ((SECONDS++))
     if [[ ${SECONDS} == ${TIMEOUT_FOR_SERVICES} ]]; then
-      swarm::log::fatal "docker bootstrap failed to start. Exiting..."
+      utils::log::fatal "docker bootstrap failed to start. Exiting..."
     fi
     sleep 1
   done
 }
 
 # Configure docker net settings, then restart it
-swarm::bootstrap::restart_docker(){
+docker::restart_docker(){
 
-  swarm::log::status "Restarting main docker daemon..."
+  utils::log::status "Restarting main docker daemon..."
 
-  swarm::log::status "BIP is set to: ${BIP}"
-  if swarm::helpers::command_exists yum ; then
+  utils::log::status "BIP is set to: ${BIP}"
+  if utils::command_exists yum ; then
     DOCKER_CONF="/etc/sysconfig/docker"
-    swarm::helpers::backup_file ${DOCKER_CONF}
+    utils::backup_file ${DOCKER_CONF}
 
     # Is there an uncommented OPTIONS line at all?
     if [[ -z $(grep "OPTIONS" ${DOCKER_CONF} | grep -v "#") ]]; then
       echo "OPTIONS=\"--mtu=${MTU} --bip=${SUBNET} \"" >> ${DOCKER_CONF}
     else
-      swarm::helpers::replace_mtu_bip ${DOCKER_CONF} "OPTIONS"
+      replace_mtu_bip ${DOCKER_CONF} "OPTIONS"
     fi
 
-    swarm::multinode::delete_bridge docker0
+    utils::delete_bridge docker0
     systemctl restart docker
-  elif swarm::helpers::command_exists apt-get; then
+  elif utils::command_exists apt-get; then
     DOCKER_CONF="/etc/default/docker"
-    swarm::helpers::backup_file ${DOCKER_CONF}
+    utils::backup_file ${DOCKER_CONF}
     # Is there an uncommented DOCKER_OPTS line at all?
     if [[ -z $(grep "DOCKER_OPTS" $DOCKER_CONF | grep -v "#") ]]; then
       echo "DOCKER_OPTS=\"--mtu=${FLANNEL_MTU} --bip=${FLANNEL_SUBNET} \"" >> ${DOCKER_CONF}
     else
-      swarm::helpers::replace_mtu_bip ${DOCKER_CONF} "DOCKER_OPTS"
+      replace_mtu_bip ${DOCKER_CONF} "DOCKER_OPTS"
     fi
 
-    swarm::multinode::delete_bridge docker0
+    utils::delete_bridge docker0
     service docker stop
     while [[ $(ps aux | grep $(which docker) | grep -v grep | wc -l) -gt 0 ]]; do
-      swarm::log::status "Waiting for docker to terminate"
+      utils::log::status "Waiting for docker to terminate"
       sleep 1
     done
     service docker start
   else
-    swarm::log::fatal "Error: docker-bootstrap currently only supports ubuntu|debian|amzn|centos|systemd."
+    utils::log::fatal "Error: docker-bootstrap currently only supports ubuntu|debian|amzn|centos|systemd."
   fi
 
 }
 
 
-swarm::helpers::replace_mtu_bip(){
+replace_mtu_bip(){
   local DOCKER_CONF=$1
   local SEARCH_FOR=$2
 

@@ -15,50 +15,51 @@
 # limitations under the License.
 
 cd "$(dirname "${BASH_SOURCE}")"
-source ./docker-bootstrap.sh
+#source ../common/utils.sh
+#source ./docker-bootstrap.sh
 
-swarm::multinode::main(){
+common::setup_var(){
 
   # Require root
   if [[ "$(id -u)" != "0" ]]; then
-    swarm::log::fatal "Please run as root"
+    utils::log::fatal "Please run as root"
   fi
 
   for tool in curl ip docker jq ; do
     if [[ ! -f $(which ${tool} 2>&1) ]]; then
-      swarm::log::status "The binary ${tool} is required. Install it..."
+      utils::log::status "The binary ${tool} is required. Install it..."
       yum install -y ${tool}
     fi
   done
 
   # Make sure docker daemon is running
   if [[ $(docker ps 2>&1 1>/dev/null; echo $?) != 0 ]]; then
-    swarm::log::fatal "Docker is not running on this machine!"
+    utils::log::fatal "Docker is not running on this machine!"
   fi
 
 
   IPAM_SUBNET_IMG=${IPAM_SUBNET_IMG:-uniseraph/ipam-subnet:0.1}
-  CURRENT_PLATFORM=$(swarm::helpers::host_platform)
+  CURRENT_PLATFORM=$(utils::host_platform)
   ARCH=${ARCH:-${CURRENT_PLATFORM##*/}}
-  swarm::log::status "ARCH is set to: ${ARCH}"
+  utils::log::status "ARCH is set to: ${ARCH}"
 
   SWARM_IMG=${SWARM_IMG:-"swarm:1.2.5"}
-  swarm::log::status "SWARM_IMG is set to: ${SWARM_IMG}"
+  utils::log::status "SWARM_IMG is set to: ${SWARM_IMG}"
   ETCD_VERSION=${ETCD_VERSION:-"3.0.4"}
-  swarm::log::status "ETCD_VERSION is set to: ${ETCD_VERSION}"
+  utils::log::status "ETCD_VERSION is set to: ${ETCD_VERSION}"
   ZK_VERSION=${ZK_VERSION:-3.4.9}
-  swarm::log::status "ZK_VERSION is set to: ${ZK_VERSION}"
+  utils::log::status "ZK_VERSION is set to: ${ZK_VERSION}"
 
   ALIYUNCLI_IMG=${ALIYUNCLI_IMG:-"uniseraph/aliyuncli"}
 
 
   MTU=${MTU:-"1472"}
-  swarm::log::status "MTU is set to: ${MTU}"
+  utils::log::status "MTU is set to: ${MTU}"
 
 
   DEFAULT_IP_ADDRESS=$( ifconfig eth0 | grep inet | awk '{{print $2}}' )
   IP_ADDRESS=${IP_ADDRESS:-${DEFAULT_IP_ADDRESS}}
-  swarm::log::status "IP_ADDRESS is set to: ${IP_ADDRESS}"
+  utils::log::status "IP_ADDRESS is set to: ${IP_ADDRESS}"
 
   TIMEOUT_FOR_SERVICES=${TIMEOUT_FOR_SERVICES:-20}
 
@@ -69,32 +70,32 @@ swarm::multinode::main(){
 }
 
 
-swarm::multinode::start_zookeeper() {
+common::start_zookeeper() {
 
-  swarm::log::status "Launching zookeeper..."
+  utils::log::status "Launching zookeeper..."
 
   docker ${BOOTSTRAP_DOCKER_PARAM} run -d \
-    --name swarm_zk_$(swarm::helpers::small_sha) \
+    --name swarm_zk_$(utils::small_sha) \
     --restart=always \
     --net=host  \
     -v /var/lib/zookeeper/data:/data \
     -v /var/lib/zookeeper/datalog:/datalog \
     zookeeper:${ZK_VERSION} 
 
-  swarm::log::status "waiting 10 seconds for zk starting..."
+  utils::log::status "waiting 10 seconds for zk starting..."
   sleep 10
 
 }
 
 
 # Start etcd on the master node
-swarm::multinode::start_etcd() {
+common::start_etcd() {
 
-  swarm::log::status "Launching etcd..."
+  utils::log::status "Launching etcd..."
 
   # TODO: Remove the 4001 port as it is deprecated
   docker ${BOOTSTRAP_DOCKER_PARAM} run -d \
-    --name swarm_etcd_$(swarm::helpers::small_sha) \
+    --name swarm_etcd_$(utils::small_sha) \
     --restart=always \
     --net=host \
     -v /var/lib/swarm/etcd:/var/etcd \
@@ -110,7 +111,7 @@ swarm::multinode::start_etcd() {
   while [[ $(curl -fsSL http://localhost:2379/health 2>&1 1>/dev/null; echo $?) != 0 ]]; do
     ((SECONDS++))
     if [[ ${SECONDS} == ${TIMEOUT_FOR_SERVICES} ]]; then
-      swarm::log::fatal "etcd failed to start. Exiting..."
+      utils::log::fatal "etcd failed to start. Exiting..."
     fi
     sleep 1
   done
@@ -119,9 +120,9 @@ swarm::multinode::start_etcd() {
 }
 
 # Start flannel in docker bootstrap, both for master and worker
-swarm::multinode::start_flannel() {
+common::start_flannel() {
 
-  swarm::log::status "Launching flannel..."
+  utils::log::status "Launching flannel..."
 
   # Set flannel net config (when running on master)
   if [[ "${MASTER_IP}" == "localhost" ]]; then
@@ -133,7 +134,7 @@ swarm::multinode::start_flannel() {
   rm -f ${FLANNEL_SUBNET_DIR}/subnet.env
 
   docker ${BOOTSTRAP_DOCKER_PARAM} run -d \
-    --name swarm_flannel_$(swarm::helpers::small_sha) \
+    --name swarm_flannel_$(utils::small_sha) \
     --restart=${RESTART_POLICY} \
     --net=host \
     --privileged \
@@ -150,134 +151,44 @@ swarm::multinode::start_flannel() {
   while [[ ! -f ${FLANNEL_SUBNET_DIR}/subnet.env ]]; do
     ((SECONDS++))
     if [[ ${SECONDS} == ${TIMEOUT_FOR_SERVICES} ]]; then
-      swarm::log::fatal "flannel failed to start. Exiting..."
+      utils::log::fatal "flannel failed to start. Exiting..."
     fi
     sleep 1
   done
 
   source ${FLANNEL_SUBNET_DIR}/subnet.env
 
-  swarm::log::status "FLANNEL_SUBNET is set to: ${FLANNEL_SUBNET}"
-  swarm::log::status "FLANNEL_MTU is set to: ${FLANNEL_MTU}"
+  utils::log::status "FLANNEL_SUBNET is set to: ${FLANNEL_SUBNET}"
+  utils::log::status "FLANNEL_MTU is set to: ${FLANNEL_MTU}"
 }
 
 
 # Turndown the local cluster
-swarm::multinode::turndown(){
+common::turndown(){
 
   # Check if docker bootstrap is running
   DOCKER_BOOTSTRAP_PID=$(ps aux | grep ${BOOTSTRAP_DOCKER_SOCK} | grep -v "grep" | awk '{print $2}')
   if [[ ! -z ${DOCKER_BOOTSTRAP_PID} ]]; then
 
-    swarm::log::status "Killing docker bootstrap..."
+    utils::log::status "Killing docker bootstrap..."
 
     # Kill the bootstrap docker daemon and it's containers
     docker -H ${BOOTSTRAP_DOCKER_SOCK} rm -f $(docker -H ${BOOTSTRAP_DOCKER_SOCK} ps -q) >/dev/null 2>/dev/null
     kill ${DOCKER_BOOTSTRAP_PID}
   fi
 
-  swarm::log::status "Killing all swarm containers..."
+  utils::log::status "Killing all swarm containers..."
 
   if [[ $(docker ps | grep "swarm" | awk '{print $1}' | wc -l) != 0 ]]; then
     docker rm -f $(docker ps | grep "swarm" | awk '{print $1}')
   fi
 
-  swarm::multinode::delete_bridge docker0
-}
-
-swarm::multinode::delete_bridge() {
-  if [[ ! -z $(ip link | grep "$1") ]]; then
-    ip link set $1 down
-    ip link del $1
-  fi
+  utils::delete_bridge docker0
 }
 
 
-# Check if a command is valid
-swarm::helpers::command_exists() {
-  command -v "$@" > /dev/null 2>&1
-}
 
-# Backup the current file
-swarm::helpers::backup_file(){
-  cp -f ${1} ${1}.backup
-}
-
-# Returns five "random" chars
-swarm::helpers::small_sha(){
-  date | md5sum | cut -c-5
-}
-
-# Get the architecture for the current machine
-swarm::helpers::host_platform() {
-  local host_os
-  local host_arch
-  case "$(uname -s)" in
-    Linux)
-      host_os=linux;;
-    *)
-      swarm::log::fatal "Unsupported host OS. Must be linux.";;
-  esac
-
-  case "$(uname -m)" in
-    x86_64*)
-      host_arch=amd64;;
-    i?86_64*)
-      host_arch=amd64;;
-    amd64*)
-      host_arch=amd64;;
-    aarch64*)
-      host_arch=arm64;;
-    arm64*)
-      host_arch=arm64;;
-    arm*)
-      host_arch=arm;;
-    ppc64le*)
-      host_arch=ppc64le;;
-    *)
-      swarm::log::fatal "Unsupported host arch. Must be x86_64, arm, arm64 or ppc64le.";;
-  esac
-  echo "${host_os}/${host_arch}"
-}
-
-swarm::helpers::parse_version() {
-  local -r version_regex="^v(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-(beta|alpha)\\.(0|[1-9][0-9]*))?$"
-  local -r version="${1-}"
-  [[ "${version}" =~ ${version_regex} ]] || {
-    swarm::log::fatal "Invalid release version: '${version}', must match regex ${version_regex}"
-    return 1
-  }
-  VERSION_MAJOR="${BASH_REMATCH[1]}"
-  VERSION_MINOR="${BASH_REMATCH[2]}"
-  VERSION_PATCH="${BASH_REMATCH[3]}"
-  VERSION_EXTRA="${BASH_REMATCH[4]}"
-  VERSION_PRERELEASE="${BASH_REMATCH[5]}"
-  VERSION_PRERELEASE_REV="${BASH_REMATCH[6]}"
-}
-
-# Print a status line. Formatted to show up in a stream of output.
-swarm::log::status() {
-  timestamp=$(date +"[%m%d %H:%M:%S]")
-  echo "+++ $timestamp $1"
-  shift
-  for message; do
-    echo "    $message"
-  done
-}
-
-# Log an error and exit
-swarm::log::fatal() {
-  timestamp=$(date +"[%m%d %H:%M:%S]")
-  echo "!!! $timestamp ${1-}" >&2
-  shift
-  for message; do
-    echo "    $message" >&2
-  done
-  exit 1
-}
-
-
-swarm::common::get_subnet_bip(){
+common::get_subnet_bip(){
   S_IP=$1
   C_IP=$2
 
@@ -293,12 +204,12 @@ swarm::common::get_subnet_bip(){
   SUBNET=$(echo ${LINE} | awk '{{print $1}}')
   BIP=$(echo ${LINE} | awk '{{print $2}}'  )
 
-  swarm::log::status "SUBNET=${SUBNET}"
-  swarm::log::status "BIP=${BIP}"
+  utils::log::status "SUBNET=${SUBNET}"
+  utils::log::status "BIP=${BIP}"
 }
 
 
-swarm::common::register_aliyuncli_config(){
+common::register_aliyuncli_config(){
 
 
   #    curl -sSL http://${MASTER_IP}:2379/v2/keys/coreos.com/network/config -XPUT \
