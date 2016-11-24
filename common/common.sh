@@ -253,7 +253,7 @@ common::start_hadoop_namenode() {
       --name=hadoop_namenode_$(utils::small_sha) \
       --net=host \
       --restart=always \
-      -v /hadoop/dfs/data:/hadoop/dfs/name \
+      -v /hadoop/dfs/name:/hadoop/dfs/name \
       -e CLUSTER_NAME=myhadoop \
       uhopper/hadoop-namenode
 

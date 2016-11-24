@@ -13,8 +13,11 @@ modprobe overlay
 echo "overlay" > /etc/modules-load.d/overlay.conf
 
 
-DOCKER_LISTEN_URL=tcp://$(ifconfig eth0 | grep inet | awk '{{print $2}}'):2376
+DEFAULT_IP=$(ifconfig eth0 | grep inet | awk '{{print $2}}')
+DOCKER_LISTEN_URL=tcp://${DEFAULT_IP}:2376
 
+## aliyun ecs hostname can't be resolved
+echo "${DEFAULT_IP} $(hostname)" >> /etc/hosts
 
 sed -e  "s#daemon#daemon -H unix:///var/run/docker.sock -H ${DOCKER_LISTEN_URL}#g" -i /usr/lib/systemd/system/docker.service
 
