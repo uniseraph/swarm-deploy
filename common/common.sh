@@ -250,9 +250,9 @@ common::start_hadoop_namenode() {
     mkdir -p /hadoop/dfs/name
 
     docker run -d \
-      --name hadoop_namenode_$(utils::small_sha) \
-      --domainname hadoop \
-      --net host \
+      --name=hadoop_namenode_$(utils::small_sha) \
+      --net=host \
+      --restart=always \
       -v /hadoop/dfs/data:/hadoop/dfs/name \
       -e CLUSTER_NAME=myhadoop \
       uhopper/hadoop-namenode
@@ -268,9 +268,9 @@ common::start_hadoop_datanode() {
     mkdir -p /hadoop/dfs/data
 
     docker run -d \
-      --name hadoop_datanode_$(utils::small_sha) \
-      --domainname hadoop \
-      --net host \
+      --name=hadoop_datanode_$(utils::small_sha) \
+      --net=host \
+      --restart=always \
       -v /hadoop/dfs/data:/hadoop/dfs/data \
       -e CORE_CONF_fs_defaultFS=hdfs://${NAMENODE_IP}:8020 \
       uhopper/hadoop-datanode
