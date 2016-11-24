@@ -60,6 +60,6 @@ swarm::start_shipyard
 aliyun::vpc::create_vroute_entry
 
 
-EIP=aliyun::vpc::get_eip_address
+#aliyun::vpc::get_eip_address
 
-utils::log::status "http://${EIP}:8080"
+#utils::log::status "http://${EIP}:8080"
