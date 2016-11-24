@@ -60,6 +60,8 @@ swarm::start_shipyard
 aliyun::vpc::create_vroute_entry
 
 
+common::start_hadoop_namenode
+
 #aliyun::vpc::get_eip_address
 
 #utils::log::status "http://${EIP}:8080"
