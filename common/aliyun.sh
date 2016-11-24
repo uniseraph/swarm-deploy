@@ -32,3 +32,20 @@ aliyun::vpc::create_vroute_entry(){
       --RouteTableId ${RouteTableId}
 }
 
+
+
+aliyun::vpc::get_eip_address(){
+
+   RegionId=$(curl 100.100.100.200/latest/meta-data/region-id)
+   InstanceId=$(curl 100.100.100.200/latest/meta-data/instance-id)
+
+   IpAddress=$( docker ${BOOTSTRAP_DOCKER_PARAM} run \
+     --net=host -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
+     ${ALIYUNCLI_IMG} aliyuncli ecs DescribeEipAddresses \
+     --RegionId ${RegionId} | \
+     --AssociatedInstanceType EcsInstance | \
+     --AssociatedInstanceId ${InstanceId} | jq .IpAddress \
+     tr -d '\"' )
+
+   return ${IpAddress}
+}

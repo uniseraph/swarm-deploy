@@ -56,6 +56,10 @@ docker::restart_docker
 
 swarm::start_master ${ETCD_URL}
 
-swarm::start_shipyard 
+swarm::start_shipyard
 aliyun::vpc::create_vroute_entry
 
+
+EIP=aliyun::vpc::get_eip_address
+
+utils::log::status "http://${EIP}:8080"

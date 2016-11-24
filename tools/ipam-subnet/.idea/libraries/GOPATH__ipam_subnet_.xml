@@ -1,16 +1,34 @@
 <component name="libraryTable">
   <library name="GOPATH &lt;ipam-subnet&gt;">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../.." />
-      <root url="file://$PROJECT_DIR$/../../../gitlab.alipay-inc.com" />
-      <root url="file://$PROJECT_DIR$/../../../go4.org" />
-      <root url="file://$PROJECT_DIR$/../../../google.golang.org" />
-      <root url="file://$PROJECT_DIR$/../../../gopkg.in" />
-      <root url="file://$PROJECT_DIR$/../../../bitbucket.org" />
-      <root url="file://$PROJECT_DIR$/../../../k8s.io" />
+      <root url="file://$PROJECT_DIR$/../../../../../bitbucket.org" />
+      <root url="file://$PROJECT_DIR$/../../../../../gitlab.alibaba-inc.com" />
+      <root url="file://$PROJECT_DIR$/../../../.." />
+      <root url="file://$PROJECT_DIR$/../../../../../golang.org" />
+      <root url="file://$PROJECT_DIR$/../../../../../basicplt" />
+      <root url="file://$PROJECT_DIR$/../../../../../k8s.io" />
+      <root url="file://$PROJECT_DIR$/../../../../../gopkg.in" />
+      <root url="file://$PROJECT_DIR$/../../../../../gitlab.alipay-inc.com" />
+      <root url="file://$PROJECT_DIR$/../../../../../google.golang.org" />
+      <root url="file://$PROJECT_DIR$/../../../../../9fans.net" />
+      <root url="file://$PROJECT_DIR$/../../../../../git.alibaba-inc.com" />
+      <root url="file://$PROJECT_DIR$/../../../../../go4.org" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../../../../../bitbucket.org" />
+      <root url="file://$PROJECT_DIR$/../../../../../gitlab.alibaba-inc.com" />
+      <root url="file://$PROJECT_DIR$/../../../.." />
+      <root url="file://$PROJECT_DIR$/../../../../../golang.org" />
+      <root url="file://$PROJECT_DIR$/../../../../../basicplt" />
+      <root url="file://$PROJECT_DIR$/../../../../../k8s.io" />
+      <root url="file://$PROJECT_DIR$/../../../../../gopkg.in" />
+      <root url="file://$PROJECT_DIR$/../../../../../gitlab.alipay-inc.com" />
+      <root url="file://$PROJECT_DIR$/../../../../../google.golang.org" />
+      <root url="file://$PROJECT_DIR$/../../../../../9fans.net" />
+      <root url="file://$PROJECT_DIR$/../../../../../git.alibaba-inc.com" />
+      <root url="file://$PROJECT_DIR$/../../../../../go4.org" />
+    </SOURCES>
     <excluded>
       <root url="file://$PROJECT_DIR$" />
     </excluded>
