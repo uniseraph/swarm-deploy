@@ -61,6 +61,7 @@ aliyun::vpc::create_vroute_entry
 
 
 common::start_hadoop_namenode
+common::start_hadoop_datanode  ${MASTER_IP}
 
 #aliyun::vpc::get_eip_address
 
