@@ -70,4 +70,3 @@ fi
 aliyun::vpc::create_vroute_entry
 
 
-common::start_hadoop_datanode ${MASTER_IP}
