@@ -1,0 +1,21 @@
+version: "2"
+services:
+  hadoop-namenode:
+    image: uhopper/hadoop-namenode
+    net: host
+    restart: always
+    volumes:
+     - /hadoop/dfs/name:/hadoop/dfs/name
+    environment:
+     - "CLUSTER_NAME=myhadoop"
+     - "affinity:container!=*hadoop-namenode*"
+     - "HDSF_CONF_dfs_namenode_datanode_registration_ip___hostname___check=false"
+  hadoop-datanode:
+    image: uhopper/hadoop-datanode
+    net: host
+    restart: always
+    volumes:
+     - /hadoop/dfs/data:/hadoop/dfs/data
+    environment:
+     - "affinity:container!=*hadoop-datanode*"
+     - "CORE_CONF_fs_defaultFS=hdfs://${NAMENODE_IP}:8080"
