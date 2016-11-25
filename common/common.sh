@@ -245,37 +245,3 @@ curl -sSL http://${MASTER_IP}:2379/v2/keys/cores.com/aliyuncli/config -XPUT \
 }
 
 
-common::start_hadoop_namenode() {
-
-    mkdir -p /hadoop/dfs/name
-
-
-    docker run    -d \
-      --name=hadoop_namenode_$(utils::small_sha) \
-      --net=host \
-      --restart=always \
-      -v /hadoop/dfs/name:/hadoop/dfs/name \
-      -e CLUSTER_NAME=myhadoop \
-      -e "affinity:container!=*hadoop_name*"
-      uhopper/hadoop-namenode
-
-}
-
-
-common::start_hadoop_datanode() {
-
-
-    NAMENODE_IP=$1
-
-    mkdir -p /hadoop/dfs/data
-
-    docker run -d \
-      --name=hadoop_datanode_$(utils::small_sha) \
-      --net=host \
-      --restart=always \
-      -v /hadoop/dfs/data:/hadoop/dfs/data \
-      -e CORE_CONF_fs_defaultFS=hdfs://${NAMENODE_IP}:8020 \
-      -e "affinity:container!=*hadoop_data*"
-      uhopper/hadoop-datanode
-
-}

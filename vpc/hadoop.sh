@@ -13,7 +13,7 @@ hdfs::start_namenode() {
       --restart=always \
       -v /hadoop/dfs/name:/hadoop/dfs/name \
       -e CLUSTER_NAME=myhadoop \
-      -e "affinity:container!=*hadoop_name*" \
+      -e "affinity:container!=*hadoop_namenode*" \
       -e "HDSF_CONF_dfs_namenode_datanode_registration_ip___hostname___check=false" \
       uhopper/hadoop-namenode
 
@@ -32,7 +32,7 @@ hdfs::start_datanode() {
       --restart=always \
       -v /hadoop/dfs/data:/hadoop/dfs/data \
       -e CORE_CONF_fs_defaultFS=hdfs://${NAMENODE_IP}:8020 \
-      -e "affinity:container!=*hadoop_data*"
+      -e "affinity:container!=*hadoop_datanode*" \
       uhopper/hadoop-datanode
 
 }
