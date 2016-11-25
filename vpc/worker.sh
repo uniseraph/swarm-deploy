@@ -20,7 +20,7 @@ source $(dirname "${BASH_SOURCE}")/../common/docker.sh
 source $(dirname "${BASH_SOURCE}")/../common/common.sh
 source $(dirname "${BASH_SOURCE}")/../common/aliyun.sh
 source $(dirname "${BASH_SOURCE}")/../common/swarm.sh
-source $(dirname "${BASH_SOURCE}")/hadoop.sh
+source $(dirname "${BASH_SOURCE}")/../vpc/hadoop.sh
 
 if [[ -z ${MASTER_IP} ]]; then
     echo "Please export MASTER_IP in your env"

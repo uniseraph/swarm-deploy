@@ -7,7 +7,7 @@ hdfs::start_namenode() {
     mkdir -p /hadoop/dfs/name
 
 
-    docker run -H ${SWARM_ENDPOINT}   -d \
+    docker -H ${SWARM_ENDPOINT} run  -d \
       --name=hadoop_namenode_$(utils::small_sha) \
       --net=host \
       --restart=always \
@@ -26,7 +26,7 @@ hdfs::start_datanode() {
 
     mkdir -p /hadoop/dfs/data
 
-    docker run -H ${SWARM_ENDPOINT}   -d \
+    docker -H ${SWARM_ENDPOINT} run  -d \
       --name=hadoop_datanode_$(utils::small_sha) \
       --net=host \
       --restart=always \
