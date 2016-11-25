@@ -20,6 +20,7 @@ source $(dirname "${BASH_SOURCE}")/../common/docker.sh
 source $(dirname "${BASH_SOURCE}")/../common/common.sh
 source $(dirname "${BASH_SOURCE}")/../common/aliyun.sh
 source $(dirname "${BASH_SOURCE}")/../common/swarm.sh
+source $(dirname "${BASH_SOURCE}")/hadoop.sh
 
 if [[ -z ${MASTER_IP} ]]; then
     echo "Please export MASTER_IP in your env"
@@ -69,4 +70,4 @@ fi
 
 aliyun::vpc::create_vroute_entry
 
-
+hdfs::start_datanode ${MASTER_IP}

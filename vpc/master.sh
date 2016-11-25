@@ -21,6 +21,7 @@ source $(dirname "${BASH_SOURCE}")/../common/docker.sh
 source $(dirname "${BASH_SOURCE}")/../common/common.sh
 source $(dirname "${BASH_SOURCE}")/../common/aliyun.sh
 source $(dirname "${BASH_SOURCE}")/../common/swarm.sh
+source $(dirname "${BASH_SOURCE}")/hadoop.sh
 
 
 MASTER_IP=$(ifconfig eth0 | grep inet | awk '{{print $2}}')
@@ -60,8 +61,8 @@ swarm::start_shipyard
 aliyun::vpc::create_vroute_entry
 
 
-common::start_hadoop_namenode
-common::start_hadoop_datanode  ${MASTER_IP}
+hdfs::start_namenode
+hdfs::start_datanode  ${MASTER_IP}
 
 #aliyun::vpc::get_eip_address
 
