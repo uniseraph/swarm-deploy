@@ -63,6 +63,14 @@ swarm::start_shipyard
 aliyun::vpc::create_vroute_entry
 
 
+mkdir -p /hadoop/dfs/name
+
+docker run -ti --rm  \
+  -v /opt/swarm-deploy/vpc:$/opt/swarm-deploy/vpc \
+  -v /usr/bin/docker:/usr/bin/docker \
+  -e NAMENODE_IP=${MASTER_IP} \
+  -e DOCKER_HOST=${MASTER_IP}:2376 \
+  docker/compose:1.9.0 -f /opt/swarm-deploy/vpc/hadoop.yml -p hadoop up -d
 #hdfs::start_namenode  ${MASTER_IP}:2376
 #hdfs::start_datanode  ${MASTER_IP}:2376 ${MASTER_IP}
 

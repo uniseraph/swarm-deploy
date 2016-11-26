@@ -70,4 +70,14 @@ fi
 
 aliyun::vpc::create_vroute_entry
 
+
+mkdir -p /hadoop/dfs/data
+
+docker run -ti --rm  \
+  -v /opt/swarm-deploy/vpc:$/opt/swarm-deploy/vpc \
+  -v /usr/bin/docker:/usr/bin/docker \
+  -e NAMENODE_IP=${MASTER_IP} \
+  -e DOCKER_HOST=${IP_ADDRESS}:2376 \
+  docker/compose:1.9.0 -f /opt/swarm-deploy/vpc/hadoop.yml -p hadoop up -d hadoop-datanode
+
 #hdfs::start_datanode ${IP_ADDRESS}:2376 ${MASTER_IP}

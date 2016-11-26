@@ -31,6 +31,6 @@ hdfs::start_datanode() {
       uhopper/hadoop-datanode
 }
 
-hdfs::start_namenode
+#hdfs::start_namenode
 
-hdfs::start_datanode
+#hdfs::start_datanode
