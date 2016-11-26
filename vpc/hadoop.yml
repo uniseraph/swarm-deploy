@@ -7,7 +7,6 @@ hadoop-namenode:
   environment:
    - "CLUSTER_NAME=myhadoop"
    - "affinity:container!=*hadoop-namenode*"
-   - "HDSF_CONF_dfs_namenode_datanode_registration_ip___hostname___check=false"
 hadoop-datanode:
   image: uhopper/hadoop-datanode
   net: host
