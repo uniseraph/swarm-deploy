@@ -66,7 +66,7 @@ aliyun::vpc::create_vroute_entry
 mkdir -p /hadoop/dfs/name
 
 docker run -ti --rm  \
-  -v /opt/swarm-deploy/vpc:$/opt/swarm-deploy/vpc \
+  -v /opt/swarm-deploy/vpc:/opt/swarm-deploy/vpc \
   -v /usr/bin/docker:/usr/bin/docker \
   -e NAMENODE_IP=${MASTER_IP} \
   -e DOCKER_HOST=${MASTER_IP}:2376 \
