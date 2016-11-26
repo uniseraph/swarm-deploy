@@ -1,13 +1,13 @@
 #!/bin/bash
 
 
+IP_ADDRESS=$( ifconfig eth0 | grep inet | awk '{{print $2}}' )
+NAMENODE_IP=${IP_ADDRESS}
+SWARM_ENDPOINT=${IP_ADDRESS}:2375
 
 hdfs::start_namenode() {
-
     mkdir -p /hadoop/dfs/name
-
     SWARM_ENDPOINT=$1
-
     docker -H ${SWARM_ENDPOINT} run  -d \
       --name=hadoop_namenode_$(utils::small_sha) \
       --net=host \
@@ -26,7 +26,6 @@ hdfs::start_datanode() {
     NAMENODE_IP=$2
 
     mkdir -p /hadoop/dfs/data
-
     docker -H ${SWARM_ENDPOINT} run  -d \
       --name=hadoop_datanode_$(utils::small_sha) \
       --net=host \

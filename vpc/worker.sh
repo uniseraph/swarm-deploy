@@ -59,7 +59,7 @@ if [ ! -d "/etc/swarm/aliyuncli" ]; then
   AccessSecret=$( echo ${ALIYUNCLI_CONFIG} | jq  .AccessSecret | tr -d '"')
   Region=$( echo ${ALIYUNCLI_CONFIG} | jq .Region | tr -d '"')
   Output=$( echo ${ALIYUNCLI_CONFIG} | jq .Output | tr -d '"')
-  
+
   docker run -ti --rm -v /etc/swarm/aliyuncli:/root/.aliyuncli \
     ${ALIYUNCLI_IMG} aliyuncli configure set \
     --output ${Output} \
@@ -70,4 +70,4 @@ fi
 
 aliyun::vpc::create_vroute_entry
 
-hdfs::start_datanode ${MASTER_IP}:2375 ${MASTER_IP}
+#hdfs::start_datanode ${IP_ADDRESS}:2376 ${MASTER_IP}
