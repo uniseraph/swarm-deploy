@@ -74,7 +74,7 @@ swarm::start_shipyard() {
     --restart=always \
     --name shipyard-controller \
     --link shipyard-rethinkdb:rethinkdb \
-    -p 8080:8080 \
+    -p 8080:10080 \
     shipyard/shipyard:latest \
     server \
     -d tcp://${SWARM_LISTEN_URL}
