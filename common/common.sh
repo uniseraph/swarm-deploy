@@ -82,8 +82,8 @@ common::start_zookeeper() {
     -v /var/lib/zookeeper/datalog:/datalog \
     zookeeper:${ZK_VERSION} 
 
-  utils::log::status "waiting 10 seconds for zk starting..."
-  sleep 10
+ # utils::log::status "waiting 10 seconds for zk starting..."
+ # sleep 10
 
 }
 

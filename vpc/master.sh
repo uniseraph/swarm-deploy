@@ -36,6 +36,8 @@ common::turndown
 
 docker::bootstrap_daemon
 
+common::start_zookeeper
+
 common::start_etcd
 if [ ! -d "/etc/swarm/aliyuncli" ]; then
   # Control will enter here if $DIRECTORY doesn't exist.
@@ -55,7 +57,7 @@ common::get_subnet_bip ${MASTER_IP} ${MASTER_IP}
 docker::restart_docker
 
 
-swarm::start_master ${ETCD_URL}
+swarm::start_master ${ZK_URL}
 
 swarm::start_shipyard
 aliyun::vpc::create_vroute_entry

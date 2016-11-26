@@ -47,7 +47,7 @@ common::get_subnet_bip ${MASTER_IP} ${IP_ADDRESS}
 
 docker::restart_docker
 
-swarm::start_agent ${ETCD_URL}
+swarm::start_agent ${ZK_URL}
 
 
 if [ ! -d "/etc/swarm/aliyuncli" ]; then
