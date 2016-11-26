@@ -6,6 +6,7 @@ hdfs::start_namenode() {
 
     mkdir -p /hadoop/dfs/name
 
+    SWARM_ENDPOINT=$1
 
     docker -H ${SWARM_ENDPOINT} run  -d \
       --name=hadoop_namenode_$(utils::small_sha) \
@@ -21,8 +22,8 @@ hdfs::start_namenode() {
 
 hdfs::start_datanode() {
 
-
-    NAMENODE_IP=$1
+    SWARM_ENDPOINT=$1
+    NAMENODE_IP=$2
 
     mkdir -p /hadoop/dfs/data
 

@@ -70,4 +70,4 @@ fi
 
 aliyun::vpc::create_vroute_entry
 
-hdfs::start_datanode ${MASTER_IP}
+hdfs::start_datanode ${MASTER_IP}:2375 ${MASTER_IP}

@@ -61,8 +61,8 @@ swarm::start_shipyard
 aliyun::vpc::create_vroute_entry
 
 
-hdfs::start_namenode
-hdfs::start_datanode  ${MASTER_IP}
+hdfs::start_namenode  ${MASTER_IP}:2375
+hdfs::start_datanode  ${MASTER_IP}:2375 ${MASTER_IP}
 
 #aliyun::vpc::get_eip_address
 
