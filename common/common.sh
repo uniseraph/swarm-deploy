@@ -245,3 +245,16 @@ curl -sSL http://${MASTER_IP}:2379/v2/keys/cores.com/aliyuncli/config -XPUT \
 }
 
 
+common:start_cadvisor() {
+
+  docker run \
+  --volume=/:/rootfs:ro \
+  --volume=/var/run:/var/run:rw \
+  --volume=/sys:/sys:ro \
+  --volume=/var/lib/docker/:/var/lib/docker:ro \
+  -p 18080:8080 \
+  -d \
+  --name=cadvisor \
+  google/cadvisor:latest
+
+}

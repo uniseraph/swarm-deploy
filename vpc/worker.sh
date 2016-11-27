@@ -73,5 +73,5 @@ aliyun::vpc::create_vroute_entry
 
 mkdir -p /hadoop/dfs/data
 
-
+common::start_cadvisor
 hdfs::start_datanode ${IP_ADDRESS} ${MASTER_IP}

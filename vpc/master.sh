@@ -67,6 +67,8 @@ mkdir -p /hadoop/dfs/name
 
 hdfs::start_all  ${MASTER_IP}
 
+
+common::start_cadvisor
 #aliyun::vpc::get_eip_address
 
 #utils::log::status "http://${EIP}:8080"
