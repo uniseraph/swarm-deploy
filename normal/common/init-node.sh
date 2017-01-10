@@ -7,9 +7,10 @@ CLUSTER_STORE=${CLUSTER_STORE:-"zk://${DEFAULT_IP}:2181/default"}
 CLUSTER_ADVERTISE=${CLUSTER_ADVERTISE:-"eth0:2376"}
 MTU=${MTU:-"1450"}
 
-rpm -i ../binary/acs-docker-1.11.1-5ec4436.x86_64.rpm
+rpm -i binary/acs-docker-1.11.1-5ec4436.x86_64.rpm
 
-modprobe overlay openvswitch
+modprobe overlay
+modprobe openvswitch
 echo "overlay" > /etc/modules-load.d/overlay.conf
 echo "openvswitch" > /etc/modules-load.d/openvswitch.conf
 
